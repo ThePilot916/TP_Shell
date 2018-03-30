@@ -3,7 +3,7 @@
 void initiate_globals(){
 
   #ifdef DEBUG
-    printf("In initiate_globals\n");
+    printf("initiating globals\n");
   #endif
 
   command_stack_current_size = 0;
@@ -15,16 +15,23 @@ void initiate_globals(){
   io_redirect_info._type[ERROR] = NULL;
 }
 
+void initiate_shell(){
+    while(1){
+      initiate_globals();
+      #ifdef DEBUG
+        printf("initiating shell\n");
+      #endif
+      prompt();
+      if(!yyparse()){
+        printf("ERROR: parser issue\n");
+      }
+    }
+}
+
 void prompt(){
-
-    #ifdef DEBUG
-      printf("In prompt\n");
-    #endif
-
-    char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
-		if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
-			printf("Error getting cwd...\n");
-		}
-		printf("autoPilot_pid:%d_@root:%s$ ",getpid(),cwd);
-
+  char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
+  if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
+    printf("Error getting cwd...\n");
+  }
+  printf("autoPilot_pid:%d_@root:%s$ ",getpid(),cwd);
 }

@@ -27,6 +27,39 @@
 #define ERROR	2
 
 /*
+ *List of implemented shell commands
+ */
+ /*
+char *shell_commands_list[] = {
+	"cd",
+	"exit",
+	"help",
+	"pwd",
+	"ls",
+	"history",
+	"alias",
+	"unalias",
+	"set_environ",
+	"rm_environ"};
+
+/*
+ *Pointers to all the implemented shell commands
+ *Matches index with the char list
+
+int (*shell_commands_pointer)(char **) = {
+	&tp_cd,
+	&tp_exit,
+	&tp_help,
+	&tp_pwd,
+	&tp_ls,
+	&tp_history,
+	&tp_alias,
+	&tp_unalias,
+	&tp_set_environment,
+	&tp_rm_environment
+};
+*/
+/*
  *Command linked list
  */
 typedef struct command_stack_node{
@@ -79,6 +112,7 @@ int args_current_push_location;
 /*
  *Shell functions
  */
+
 int tp_cd(char **);
 int tp_exit();
 int tp_help();
@@ -94,8 +128,9 @@ int tp_rm_environment(char *);
  *Execution realated functions
  */
 void initiate_globals();
-void execute();
+void initiate_shell();
 void prompt();
+void execute();
 
 /*
  *Command and IO_redirect stack operations

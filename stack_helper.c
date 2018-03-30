@@ -120,6 +120,11 @@ void command_io_stack_display(){
 
 
 void i_o_push(char *val, int type){
+
+    #ifdef DEBUG
+      printf("in i_o_push\n");
+    #endif
+    
     char *temp = malloc(sizeof(char)*strlen(val));
     strcpy(temp, val);
     io_redirect_info._type[type] = temp;

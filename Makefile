@@ -7,12 +7,12 @@ execute: tpshell_execution.c	tpshell.h
 stack_helper:	stack_helper.c tpshell.h
 							gcc -g -c stack_helper.c -o stk_hlp.o
 
-lex: tpshell.l tpshell.h
-			lex tpshell.l
-yacc: tpshell.y tpshell.h
-			yacc -d tpshell.y
+lex: lex.l tpshell.h
+			lex lex.l
+yacc: yacc.y tpshell.h
+			yacc -d yacc.y
 
-main: tpshell.c tpshell.h
-			gcc	-g lex.yy.c tpshell.c shell_main.c tp_exec.o stk_hlp.o -ll -w -o pilotshell.exe
+main: shell_main.c tpshell.h
+			gcc	-g lex.yy.c y.tab.c shell_main.c tp_exec.o stk_hlp.o -ll -w -o pilotshell.exe
 clean:
-	rm *.exe *.o y.tab.h lex.yy.c tpshell.c
+	rm *.exe *.o y.tab.h lex.yy.c y.tab.c

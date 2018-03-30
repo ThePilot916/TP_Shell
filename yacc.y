@@ -22,8 +22,6 @@ command_line: pipe_list io_modifier_list background_opt NEWLINE	{
 																																		printf("In command_line\n");
 																																	#endif
 																																	prompt();
-																																	prompt();
-
 																																}
 						| NEWLINE																						{
 																																	#ifdef DEBUG
@@ -59,7 +57,7 @@ pipe_list: pipe_list PIPE cmd_args {
 																				 #endif
 																				 current_command_args_rev();
 																				 command_stack_current_size++;
-																				
+
 																		}
 		 	 	 ;
 
