@@ -19,4 +19,4 @@ shell_commands: shell_commands.c tpshell.h
 main: shell_main.c tpshell.h
 			gcc	-g lex.yy.c y.tab.c shell_main.c .tp_exec.o .stk_hlp.o .shell_cmd.o -ll -w -o pilotshell.exe
 clean:
-	rm *.exe .*.o *.o y.tab.h lex.yy.c y.tab.c
+	rm *.exe .*.o y.tab.h lex.yy.c y.tab.c

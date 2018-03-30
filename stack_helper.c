@@ -14,7 +14,7 @@ void push_init(){
 
   else{
     args_current_push_location = 0;
-    struct command_stack_node *temp = malloc(sizeof(command_stack_node));
+    command_stack_node *temp = malloc(sizeof(command_stack_node));
 
     temp->number = command_stack_current_size+1;
     temp->args = NULL;
@@ -24,7 +24,6 @@ void push_init(){
       head = temp;
       current_node = head;
     }
-
     else{
       current_node->next = temp;
       current_node = current_node->next;

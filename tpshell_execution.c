@@ -18,10 +18,12 @@ void initiate_globals(){
 
 void initiate_shell(){
     while(1){
-      initiate_globals();
+
       #ifdef DEBUG
         printf("initiating shell\n");
       #endif
+
+      initiate_globals();
       prompt();
       if(!yyparse()){
         printf("ERROR: parser issue\n");
@@ -36,12 +38,17 @@ void prompt(){
   }
   printf("autoPilot_pid:%d_@root:%s$ ",getpid(),cwd);
 }
-
 /*
+
  *To execute the parsed command stack
  */
 
 void execute_stack(){
+
+  #ifdef DEBUG
+    printf("executing stack \n");
+  #endif
+
   int previous_in = dup(INPUT);
   int previous_out = dup(OUTPUT);
 
@@ -57,12 +64,12 @@ void execute_stack(){
   }
 
   current_node = head;
+
   for(int i = 0; i < command_stack_current_size; i++){
 
     //redirecting stdin
     dup2(fd_in,INPUT);
     close(fd_in);
-
 
     //setting output redirection
     if(i == command_stack_current_size-1){
@@ -75,7 +82,6 @@ void execute_stack(){
         fd_out = dup(previous_out);
       }
     }
-
     else{
       //not the last command being executed, create a pipe and redirect
       int fd_pipe[2];
@@ -87,8 +93,7 @@ void execute_stack(){
     //redirecting stdout
     dup2(fd_out,OUTPUT);
     close(fd_out);
-
-
+    
     int custom = execute_custom(current_node->args);
     if(custom == 0){
       execute_inbuilt(current_node->args);
@@ -104,13 +109,15 @@ void execute_stack(){
 
 }
 
-int custom_command_count(){
-  return sizeof(shell_commands_list)/sizeof(char *);
-}
 
 int execute_custom(char **args){
+
+  #ifdef DEBUG
+    printf("in execute_custom\n");
+  #endif
+
   int present = 0;
-  for(int i = 0; i < custom_command_count(); i++){
+  for(int i = 0; i < CUSTOM_SHELL_COUNT; i++){
     if(strcmp(shell_commands_list[i],args[0]) == 0){
       present = 1;
       (*shell_commands_pointer[i])(args);
@@ -121,6 +128,11 @@ int execute_custom(char **args){
 }
 
 int execute_inbuilt(char **args){
+
+  #ifdef DEBUG
+    printf("in execute_inbuilt\n");
+  #endif
+
   pid_t fork_val;
   fork_val = fork();
   if(fork_val == -1){

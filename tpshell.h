@@ -1,6 +1,7 @@
 #ifndef DECLARED
 #define DECLARED
 
+#define DEBUG
 
 #include <stdio.h>
 #include <string.h>
@@ -9,9 +10,14 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <error.h>
 #include <dirent.h>
 #include <termios.h>
 #include <time.h>
+#include <signal.h>
+
 
 
 #define CMD_MAX_LEN 256
@@ -19,12 +25,14 @@
 #define HISTORY_MAX 25
 #define ALIAS_MAX 10
 #define MAX_BUF_SIZE 255
-
+#define CUSTOM_SHELL_COUNT 10
 
 #define INPUT	0
 #define OUTPUT	1
 #define ERROR	2
 
+extern char *shell_commands_list[CUSTOM_SHELL_COUNT];
+extern int (*shell_commands_pointer[CUSTOM_SHELL_COUNT])(char **);
 
 /*
  *Shell functions
@@ -50,7 +58,7 @@ void prompt();
 void execute_stack();
 int execute_custom(char **);
 int execute_inbuilt(char **);
-int custom_command_count();
+
 
 /*
  *Command and IO_redirect stack operations
@@ -64,39 +72,7 @@ void i_o_push(char *, int);
 
 
 
-/*
- *List of implemented shell commands
- */
 
- char *shell_commands_list[] = {
- 	"cd",
- 	"exit",
- 	"help",
- 	"pwd",
- 	"ls",
- 	"history",
- 	"alias",
- 	"unalias",
- 	"set_environ",
- 	"rm_environ"
- };
-
- /*
-  *Pointers to all the implemented shell commands
-  *Matches index with the char list
-  */
- int (*shell_commands_pointer[])(char **) = {
- 	&tp_cd,
- 	&tp_exit,
- 	&tp_help,
- 	&tp_pwd,
- 	&tp_ls,
- 	&tp_history,
- 	&tp_alias,
- 	&tp_unalias,
- 	&tp_set_environment,
- 	&tp_rm_environment
- };
 
 /*
  *Command linked list
