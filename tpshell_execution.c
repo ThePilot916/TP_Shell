@@ -18,10 +18,10 @@ void initiate_globals(){
 void prompt(){
 
     #ifdef DEBUG
-      printf("In promt\n");
+      printf("In prompt\n");
     #endif
 
-    char *cwd = (char *)malloc(sizeof(char)*MAX_BUF_SIZE);
+    char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
 		if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
 			printf("Error getting cwd...\n");
 		}

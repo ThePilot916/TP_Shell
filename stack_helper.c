@@ -14,10 +14,9 @@ void push_init(){
 
   else{
     args_current_push_location = 0;
-    command_stack_node *temp = (command_stack_node *)malloc(sizeof(command_stack_node));
-    command_stack_current_size++;
+    struct command_stack_node *temp = malloc(sizeof(command_stack_node));
 
-    temp->number = command_stack_current_size;
+    temp->number = command_stack_current_size+1;
     temp->args = NULL;
     temp->next = NULL;
 
@@ -30,6 +29,7 @@ void push_init(){
       current_node->next = temp;
       current_node = current_node->next;
     }
+    command_stack_current_size++;
   }
 }
 
@@ -40,13 +40,16 @@ void arg_push(char *arg){
         printf("In arg_push\n");
       #endif
 
-      char *temp = (char *)malloc(strlen(arg)*sizeof(char));
+      char *temp = malloc(strlen(arg)*sizeof(char));
       strcpy(temp,arg);
+      if(current_node == NULL){
+        printf("Its null you retard\n");
+      }
       if(args_current_push_location == 0){
-        current_node->args = (char **)malloc(sizeof(char *));
+        current_node->args = malloc(sizeof(char *));
       }
       else{
-        current_node->args = (char **)realloc(current_node->args,sizeof(char *)*(args_current_push_location+1));
+        current_node->args = realloc(current_node->args,sizeof(char *)*(args_current_push_location+1));
       }
       current_node->args[args_current_push_location] = temp;
       args_current_push_location++;
@@ -58,10 +61,10 @@ void current_command_args_rev(){
       printf("In current_command_args_rev\n");
     #endif
 
-    char **temp = (char **)malloc(sizeof(char *)*args_current_push_location);
-    temp[0] = current_node->args[0];
-    for(int i = 1; i < args_current_push_location; i++){
-      temp[i] = current_node->args[args_current_push_location-i];
+    char **temp = malloc(sizeof(char *)*args_current_push_location);
+
+    for(int i = 0; i < args_current_push_location; i++){
+      temp[i] = current_node->args[args_current_push_location-i-1];
     }
     temp[args_current_push_location] = NULL;
 
@@ -117,7 +120,7 @@ void command_io_stack_display(){
 
 
 void i_o_push(char *val, int type){
-    char *temp = (char *)malloc(sizeof(char)*strlen(val));
+    char *temp = malloc(sizeof(char)*strlen(val));
     strcpy(temp, val);
     io_redirect_info._type[type] = temp;
 }

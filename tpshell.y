@@ -19,7 +19,9 @@
  														#ifdef DEBUG
 															printf("In cmd_args\n");
 														#endif
- 														push_init();
+														if(command_stack_current_size == 0){
+															push_init();
+														}
  														arg_push($1);
  													}
  				;
@@ -28,7 +30,11 @@ arg_list: arg_list WORD  {
 														#ifdef DEBUG
 															printf("In arg_list\n");
 														#endif
+														if(command_stack_current_size == 0){
+															push_init();
+														}
 															arg_push($2);
+															printf("%s\n",current_node->args[0]);
 													}
 				|
 				;
@@ -86,7 +92,6 @@ command_line: pipe_list io_modifier_list background_opt NEWLINE	{
 
 %%
 
-
 void yyerror(const char *error){
-	printf("\nError: %s\n",error);
+	printf("ERROR: %s\n",error);
 }

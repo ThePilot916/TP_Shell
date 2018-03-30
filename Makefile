@@ -13,4 +13,6 @@ yacc: tpshell.y tpshell.h
 			yacc -d tpshell.y
 
 main: tpshell.c tpshell.h
-			gcc	-g lex.yy.c y.tab.c -Wall tpshell.c tp_exec.o stk_hlp.o -ll -o pilotshell
+			gcc	-g lex.yy.c tpshell.c -Wall shell_main.c tp_exec.o stk_hlp.o -ll -o pilotshell.exe
+clean:
+	rm *.exe *.o y.tab.h lex.yy.c tpshell.c
