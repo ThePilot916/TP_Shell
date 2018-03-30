@@ -6,8 +6,6 @@
 
 %%
 
-
-
 \n		return NEWLINE;
 [ \t]	;
 ">"		return GREAT;
@@ -18,6 +16,5 @@
 "&"		return AMP;
 [^ \t\n][^ \t\n]*	{yylval.str = strdup(yytext);
 					return WORD;}
-.			return NOTOKEN;
 
 %%
