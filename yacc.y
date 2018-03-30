@@ -13,25 +13,30 @@
 %token GREAT GREATx2 NEWLINE WORD GREATAMP AMP PIPE LESS
 %token <str> WORD
 
-%error-verbose
+
 
 %%
+command_list:
+						|command_list command_line
+						;
 
-command_line: pipe_list io_modifier_list background_opt NEWLINE	{
+command_line: pipe_list io_modifier_list background_opt NEWLINE  {
 																																	#ifdef DEBUG
-																																		printf("In command_line\n");
+																																		printf("*********In command_line*********\n");
 																																	#endif
-																																	prompt();
+																																	printf("Stack size:_________ %d\n",command_stack_current_size);
+																																	command_io_stack_display();
+
 																																	execute_stack();
+																																	shell_reset();
 																																	prompt();
 																																}
-						| NEWLINE																						{
+						| NEWLINE                                            {
 																																	#ifdef DEBUG
-																																		printf("In command_line\n");
+																																		printf("*********In command_line*********\n");
 																																	#endif
 																																	prompt();
 																																}
-
 						;
 
 io_modifier_list: io_modifier_list io_modifier
@@ -39,57 +44,65 @@ io_modifier_list: io_modifier_list io_modifier
 								;
 
 
-io_modifier: GREATx2 WORD	{i_o_push($2, ERROR);}
-		   		 | GREAT WORD		{i_o_push($2, OUTPUT);}
-		   		 | GREATx2 AMP WORD {i_o_push($3,ERROR);}
-		   		 | GREATAMP WORD	{i_o_push($2, OUTPUT);}
-		   		 | LESS WORD	{i_o_push($2,INPUT);}
-		   		 ;
+io_modifier: GREATx2 WORD  {i_o_push($2, ERROR);}
+						| GREAT WORD    {i_o_push($2, OUTPUT);}
+						| GREATx2 AMP WORD {i_o_push($3,ERROR);}
+						| GREATAMP WORD  {i_o_push($2, OUTPUT);}
+						| LESS WORD  {i_o_push($2,INPUT);}
+						;
 
 pipe_list: pipe_list PIPE cmd_args {
 																				#ifdef DEBUG
-																					printf("In pipe_list, about to push node\n");
+																					printf("*********In pipe_list, about to push node*********\n");
 																				#endif
-																	  }
-		 		 | cmd_args									{
-						 														#ifdef DEBUG
-																					 printf("In pipe_list, about to push node\n");
-																				 #endif
-																		}
-		 	 	 ;
 
- cmd_args: WORD arg_list	{
- 														#ifdef DEBUG
-															printf("In cmd_args\n");
+																				 //printf("before1: %d\n",command_stack_current_size);
+																				 command_stack_current_size++;
+																				 //printf("after1: %d\n",command_stack_current_size);
+																		}
+					| cmd_args                  {
+																				 #ifdef DEBUG
+																					 printf("*********In pipe_list, about to push node*********\n");
+																				 #endif
+
+																				 //printf("before2: %d\n",command_stack_current_size);
+																				 //command_stack_current_size++;
+																				 //printf("after2: %d\n",command_stack_current_size);
+																		}
+					 ;
+
+ cmd_args: WORD arg_list  {
+														 #ifdef DEBUG
+															printf("*********In cmd_args*********\n");
 														#endif
 														if(command_stack_current_size == 0 && args_current_push_location == 0){
-															push_init();
+														 push_init();
 														}
- 														arg_push($1);
+														arg_push($1);
 														current_command_args_rev();
-														command_stack_current_size++;
-														command_io_stack_display();
- 													}
- 				;
+														push_init();
+														current_command_display();
+													 }
+				 ;
 
 arg_list: arg_list WORD  {
 														#ifdef DEBUG
-															printf("In arg_list\n");
+															printf("*********In arg_list*********\n");
 														#endif
 														if(command_stack_current_size == 0 && args_current_push_location == 0){
-															push_init();
+														 push_init();
 														}
-															arg_push($2);
+														arg_push($2);
 													}
 				|
 				;
 
-background_opt: AMP				{
+background_opt: AMP        {
 														if(current_node != NULL)
 															background = true;
 													}
-			  			|
-			  			;
+							|
+							;
 
 
 %%

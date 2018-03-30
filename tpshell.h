@@ -10,14 +10,9 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <error.h>
 #include <dirent.h>
 #include <termios.h>
 #include <time.h>
-#include <signal.h>
-
 
 
 #define CMD_MAX_LEN 256
@@ -25,14 +20,16 @@
 #define HISTORY_MAX 25
 #define ALIAS_MAX 10
 #define MAX_BUF_SIZE 255
-#define CUSTOM_SHELL_COUNT 10
+#define CUSTOM_COMMAND_COUNT 10
 
 #define INPUT	0
-#define OUTPUT	1
+#define OUTPUT 1
 #define ERROR	2
 
-extern char *shell_commands_list[CUSTOM_SHELL_COUNT];
-extern int (*shell_commands_pointer[CUSTOM_SHELL_COUNT])(char **);
+
+
+extern char *shell_commands_list[CUSTOM_COMMAND_COUNT];
+extern int (*shell_commands_pointer[CUSTOM_COMMAND_COUNT])(char **);
 
 /*
  *Shell functions
@@ -58,7 +55,7 @@ void prompt();
 void execute_stack();
 int execute_custom(char **);
 int execute_inbuilt(char **);
-
+void shell_reset();
 
 /*
  *Command and IO_redirect stack operations
@@ -69,9 +66,7 @@ void current_command_args_rev();
 void command_io_stack_display();
 void current_command_display();
 void i_o_push(char *, int);
-
-
-
+void history_push();
 
 
 /*
@@ -80,6 +75,7 @@ void i_o_push(char *, int);
 typedef struct command_stack_node{
 	int	   number;
 	char **args;
+	int args_count;
 	struct command_stack_node *next;
 }command_stack_node;
 
@@ -123,7 +119,7 @@ command_history command_hist;
 int command_stack_current_size;
 int args_current_push_location;
 bool background;
-
+int history_current_pointer;
 
 
 

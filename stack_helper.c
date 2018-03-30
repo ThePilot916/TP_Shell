@@ -4,7 +4,7 @@
 void push_init(){
 
   #ifdef DEBUG
-    printf("In push_init\n");
+    printf("____________in push_init____________\n");
   #endif
 
   if(command_stack_current_size > PIPE_MAX){
@@ -14,16 +14,18 @@ void push_init(){
 
   else{
     args_current_push_location = 0;
-    command_stack_node *temp = malloc(sizeof(command_stack_node));
+    struct command_stack_node *temp = malloc(sizeof(command_stack_node));
 
     temp->number = command_stack_current_size+1;
     temp->args = NULL;
+    temp->args_count = 0;
     temp->next = NULL;
 
     if(command_stack_current_size == 0){
       head = temp;
       current_node = head;
     }
+
     else{
       current_node->next = temp;
       current_node = current_node->next;
@@ -36,14 +38,12 @@ void push_init(){
 void arg_push(char *arg){
 
       #ifdef DEBUG
-        printf("In arg_push\n");
+        printf("____________in arg_push____________\n");
       #endif
 
       char *temp = malloc(strlen(arg)*sizeof(char));
       strcpy(temp,arg);
-      if(current_node == NULL){
-        printf("Its null you retard\n");
-      }
+
       if(args_current_push_location == 0){
         current_node->args = malloc(sizeof(char *));
       }
@@ -57,7 +57,7 @@ void arg_push(char *arg){
 void current_command_args_rev(){
 
     #ifdef DEBUG
-      printf("In current_command_args_rev\n");
+      printf("____________in current_command_args_rev____________\n");
     #endif
 
     char **temp = malloc(sizeof(char *)*args_current_push_location);
@@ -73,6 +73,8 @@ void current_command_args_rev(){
     for(int i = 0; i <= args_current_push_location; i++){
       current_node->args[i] = temp[i];
     }
+    current_node->args_count = args_current_push_location;
+    //printf("%s\t%s\n",current_node->args[0],current_node->args[1]);
 
     free(temp);
 }
@@ -80,7 +82,7 @@ void current_command_args_rev(){
 void current_command_display(){
 
     #ifdef DEBUG
-      printf("In current_command_display\n");
+      printf("____________in current_command_display____________\n");
     #endif
 
     if(current_node == NULL){
@@ -88,11 +90,11 @@ void current_command_display(){
     }
     else{
       char **temp = current_node->args;
-      printf("CMD: ");
-      while(temp != NULL){
-        printf("%s",*temp);
+      int i = 0;
+      while(i < args_current_push_location){
+        printf("%s ",*(temp+i));
+        i++;
       }
-      temp++;
       printf("\n");
     }
 }
@@ -100,20 +102,23 @@ void current_command_display(){
 void command_io_stack_display(){
 
     #ifdef DEBUG
-      printf("In command_stack_display\n");
+      printf("____________in command_stack_display____________\n");
     #endif
 
     command_stack_node *temp;
     temp = head;
-    while(temp != NULL){
+    int i = 0;
+    while(temp != NULL && i < command_stack_current_size){
       printf("\n%d: ",temp->number);
       char **arg_temp = temp->args;
-      while(arg_temp != NULL){
-        printf("%s",*arg_temp);
-        arg_temp++;
+      int i = 0;
+      while(i < temp->args_count){
+        printf("%s ",*(arg_temp+i));
+        i++;
       }
       printf("\n");
       temp = temp->next;
+      i++;
     }
 }
 
@@ -121,7 +126,7 @@ void command_io_stack_display(){
 void i_o_push(char *val, int type){
 
     #ifdef DEBUG
-      printf("in i_o_push\n");
+      printf("____________in i_o_push____________\n");
     #endif
 
     char *temp = malloc(sizeof(char)*strlen(val));

@@ -3,7 +3,7 @@
 void initiate_globals(){
 
   #ifdef DEBUG
-    printf("initiating globals\n");
+    printf("____________initiating globals____________\n");
   #endif
 
   command_stack_current_size = 0;
@@ -14,13 +14,13 @@ void initiate_globals(){
   io_redirect_info._type[OUTPUT] = NULL;
   io_redirect_info._type[ERROR] = NULL;
   background = false;
+  history_current_pointer = 0;
 }
 
 void initiate_shell(){
-    while(1){
 
       #ifdef DEBUG
-        printf("initiating shell\n");
+        printf("____________initiating shell____________\n");
       #endif
 
       initiate_globals();
@@ -28,7 +28,6 @@ void initiate_shell(){
       if(!yyparse()){
         printf("ERROR: parser issue\n");
       }
-    }
 }
 
 void prompt(){
@@ -38,15 +37,15 @@ void prompt(){
   }
   printf("autoPilot_pid:%d_@root:%s$ ",getpid(),cwd);
 }
-/*
 
+/*
  *To execute the parsed command stack
  */
 
 void execute_stack(){
 
   #ifdef DEBUG
-    printf("executing stack \n");
+    printf("___________executing stack____________ \n");
   #endif
 
   int previous_in = dup(INPUT);
@@ -54,7 +53,7 @@ void execute_stack(){
 
   int fd_in,fd_out;
 
-  if(io_redirect_info._type[INPUT]){
+  if(io_redirect_info._type[INPUT] != NULL){
     //using redirected input
     fd_in = open(io_redirect_info._type[INPUT],O_RDONLY);
   }
@@ -64,8 +63,7 @@ void execute_stack(){
   }
 
   current_node = head;
-
-  for(int i = 0; i < command_stack_current_size; i++){
+  for(int i = 0; i < command_stack_current_size && (current_node != NULL || current_node->args != NULL); i++){
 
     //redirecting stdin
     dup2(fd_in,INPUT);
@@ -73,7 +71,8 @@ void execute_stack(){
 
     //setting output redirection
     if(i == command_stack_current_size-1){
-      if(io_redirect_info._type[OUTPUT]){
+
+      if(io_redirect_info._type[OUTPUT] != NULL){
         //use redirected output
         fd_out = open(io_redirect_info._type[OUTPUT],O_RDWR|O_CREAT,0666);
       }
@@ -93,7 +92,7 @@ void execute_stack(){
     //redirecting stdout
     dup2(fd_out,OUTPUT);
     close(fd_out);
-    
+
     int custom = execute_custom(current_node->args);
     if(custom == 0){
       execute_inbuilt(current_node->args);
@@ -113,11 +112,11 @@ void execute_stack(){
 int execute_custom(char **args){
 
   #ifdef DEBUG
-    printf("in execute_custom\n");
+    printf("____________in execute_custom____________\n");
   #endif
 
   int present = 0;
-  for(int i = 0; i < CUSTOM_SHELL_COUNT; i++){
+  for(int i = 0; i < CUSTOM_COMMAND_COUNT; i++){
     if(strcmp(shell_commands_list[i],args[0]) == 0){
       present = 1;
       (*shell_commands_pointer[i])(args);
@@ -130,7 +129,7 @@ int execute_custom(char **args){
 int execute_inbuilt(char **args){
 
   #ifdef DEBUG
-    printf("in execute_inbuilt\n");
+    printf("____________in execute_inbuilt____________\n");
   #endif
 
   pid_t fork_val;
@@ -144,4 +143,24 @@ int execute_inbuilt(char **args){
   if(!background){
     waitpid(fork_val,NULL,0);
   }
+}
+
+
+void shell_reset(){
+  current_node = head;
+  while(current_node->next != NULL){
+    command_stack_node *temp = current_node->next;
+    free(current_node->args);
+    free(current_node);
+  }
+  current_node = NULL;
+  head = NULL;
+  command_stack_current_size = 0;
+  args_current_push_location = 0;
+  head = NULL;
+  current_node = NULL;
+  io_redirect_info._type[INPUT] = NULL;
+  io_redirect_info._type[OUTPUT] = NULL;
+  io_redirect_info._type[ERROR] = NULL;
+  background = false;
 }
