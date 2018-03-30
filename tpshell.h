@@ -1,7 +1,6 @@
 #ifndef DECLARED
 #define DECLARED
 
-#define DEBUG
 
 #include <stdio.h>
 #include <string.h>
@@ -26,39 +25,79 @@
 #define OUTPUT	1
 #define ERROR	2
 
+
+/*
+ *Shell functions
+ */
+
+int tp_cd(char **);
+int tp_exit(char **);
+int tp_help(char **);
+int tp_pwd(char **);
+int tp_ls(char **);
+int tp_history(char **);
+int tp_alias(char **);
+int tp_unalias(char **);
+int tp_set_environment(char **);
+int tp_rm_environment(char **);
+
+/*
+ *Execution realated functions
+ */
+void initiate_globals();
+void initiate_shell();
+void prompt();
+void execute_stack();
+int execute_custom(char **);
+int execute_inbuilt(char **);
+int custom_command_count();
+
+/*
+ *Command and IO_redirect stack operations
+ */
+void push_init();
+void arg_push(char *);
+void current_command_args_rev();
+void command_io_stack_display();
+void current_command_display();
+void i_o_push(char *, int);
+
+
+
 /*
  *List of implemented shell commands
  */
+
+ char *shell_commands_list[] = {
+ 	"cd",
+ 	"exit",
+ 	"help",
+ 	"pwd",
+ 	"ls",
+ 	"history",
+ 	"alias",
+ 	"unalias",
+ 	"set_environ",
+ 	"rm_environ"
+ };
+
  /*
-char *shell_commands_list[] = {
-	"cd",
-	"exit",
-	"help",
-	"pwd",
-	"ls",
-	"history",
-	"alias",
-	"unalias",
-	"set_environ",
-	"rm_environ"};
+  *Pointers to all the implemented shell commands
+  *Matches index with the char list
+  */
+ int (*shell_commands_pointer[])(char **) = {
+ 	&tp_cd,
+ 	&tp_exit,
+ 	&tp_help,
+ 	&tp_pwd,
+ 	&tp_ls,
+ 	&tp_history,
+ 	&tp_alias,
+ 	&tp_unalias,
+ 	&tp_set_environment,
+ 	&tp_rm_environment
+ };
 
-/*
- *Pointers to all the implemented shell commands
- *Matches index with the char list
-
-int (*shell_commands_pointer)(char **) = {
-	&tp_cd,
-	&tp_exit,
-	&tp_help,
-	&tp_pwd,
-	&tp_ls,
-	&tp_history,
-	&tp_alias,
-	&tp_unalias,
-	&tp_set_environment,
-	&tp_rm_environment
-};
-*/
 /*
  *Command linked list
  */
@@ -107,40 +146,8 @@ command_aliases command_alias;
 command_history command_hist;
 int command_stack_current_size;
 int args_current_push_location;
+bool background;
 
-
-/*
- *Shell functions
- */
-
-int tp_cd(char **);
-int tp_exit();
-int tp_help();
-int tp_pwd(char **);
-int tp_ls(char **);
-int tp_history();
-int tp_alias(char *,char *);
-int tp_unalias(char *,char *);
-int tp_set_environment(char *);
-int tp_rm_environment(char *);
-
-/*
- *Execution realated functions
- */
-void initiate_globals();
-void initiate_shell();
-void prompt();
-void execute();
-
-/*
- *Command and IO_redirect stack operations
- */
-void push_init();
-void arg_push(char *);
-void current_command_args_rev();
-void command_io_stack_display();
-void current_command_display();
-void i_o_push(char *, int);
 
 
 

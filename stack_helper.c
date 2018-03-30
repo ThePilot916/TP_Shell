@@ -71,7 +71,7 @@ void current_command_args_rev(){
     //realloc to +1 size to accomodate the NULL at the end.
     current_node->args = (char **)realloc(current_node->args,sizeof(char *)*args_current_push_location);
     //copying the correctly reversed arg_list to the original arg_list
-    for(int i = 0; i < args_current_push_location; i++){
+    for(int i = 0; i <= args_current_push_location; i++){
       current_node->args[i] = temp[i];
     }
 
@@ -124,7 +124,7 @@ void i_o_push(char *val, int type){
     #ifdef DEBUG
       printf("in i_o_push\n");
     #endif
-    
+
     char *temp = malloc(sizeof(char)*strlen(val));
     strcpy(temp, val);
     io_redirect_info._type[type] = temp;

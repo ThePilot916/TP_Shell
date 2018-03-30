@@ -47,17 +47,11 @@ pipe_list: pipe_list PIPE cmd_args {
 																				#ifdef DEBUG
 																					printf("In pipe_list, about to push node\n");
 																				#endif
-																				current_command_args_rev();
-																				command_stack_current_size++;
-
 																	  }
 		 		 | cmd_args									{
 						 														#ifdef DEBUG
 																					 printf("In pipe_list, about to push node\n");
 																				 #endif
-																				 current_command_args_rev();
-																				 command_stack_current_size++;
-
 																		}
 		 	 	 ;
 
@@ -69,6 +63,8 @@ pipe_list: pipe_list PIPE cmd_args {
 															push_init();
 														}
  														arg_push($1);
+														current_command_args_rev();
+														command_stack_current_size++;
  													}
  				;
 
@@ -84,7 +80,10 @@ arg_list: arg_list WORD  {
 				|
 				;
 
-background_opt: AMP
+background_opt: AMP				{
+														if(current_node != NULL)
+															background = true;
+													}
 			  			|
 			  			;
 
