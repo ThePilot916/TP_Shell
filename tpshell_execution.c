@@ -14,7 +14,8 @@ void initiate_globals(){
   io_redirect_info._type[OUTPUT] = NULL;
   io_redirect_info._type[ERROR] = NULL;
   background = false;
-  history_current_pointer = 0;
+  history_current_display_pointer = 0;
+  history_current_push_pointer = 0;
 }
 
 void initiate_shell(){
@@ -29,9 +30,12 @@ void initiate_shell(){
         fflush(stdout);
         sleep(0.01);
     	}
+
+      initiate_globals();
+
     	printf("\nInitialisation complete!!!");
     	printf("\nEnjoy the flight captain!!!\n");
-      initiate_globals();
+
       prompt();
       if(!yyparse()){
         printf("ERROR: parser issue\n");
@@ -41,7 +45,7 @@ void initiate_shell(){
 void prompt(){
   char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
   if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
-    printf("Error getting cwd...\n");
+    printf("ERROR: getting cwd...\n");
   }
   printf("autoPilot_pid:%d_@root:%s$ ",getpid(),cwd);
 }
@@ -103,11 +107,15 @@ void execute_stack(){
     //redirecting stdout
     dup2(fd_out,OUTPUT);
     close(fd_out);
-    printf("%s\n",current_node->args[0]);
     int custom = execute_custom(current_node->args);
     if(custom == 0){
-      execute_inbuilt(current_node->args);
+      int inbuilt = execute_inbuilt(current_node->args);
+      if(inbuilt == -1){
+        printf("ERROR: no such command found\n");
+        break;
+      }
     }
+
     current_node = current_node->next;
   }
 
@@ -130,6 +138,8 @@ int execute_custom(char **args){
   for(int i = 0; i < CUSTOM_COMMAND_COUNT; i++){
     if(strcmp(shell_commands_list[i],*(args)) == 0){
       present = 1;
+      time(&current_time);
+      history_push(args,getpid(),geteuid());
       (*shell_commands_pointer[i])(args);
       break;
     }
@@ -143,17 +153,26 @@ int execute_inbuilt(char **args){
     printf("____________in execute_inbuilt____________\n");
   #endif
 
+  int res = 0;
+
   pid_t fork_val;
+  pid_t pid;
+  uid_t uid;
   fork_val = fork();
   if(fork_val == -1){
     printf("ERROR: issue forking process\n");
   }
   else if(fork_val == 0){
-    execvp(args[0],args);
+    time(&current_time);
+    pid = getpid();
+    uid = geteuid();
+    res = execvp(args[0],args);
   }
+  history_push(args,pid,uid);
   if(!background){
     waitpid(fork_val,NULL,0);
   }
+  return res;
 }
 
 

@@ -132,3 +132,50 @@ void i_o_push(char *val, int type){
     strcpy(temp, val);
     io_redirect_info._type[type] = temp;
 }
+
+
+void history_push(char **args,pid_t pid, uid_t uid){
+
+  #ifdef DEBUG
+    printf("____________history_push____________\n");
+  #endif
+
+  command_hist[history_current_push_pointer]._command = command_to_string(args);
+  command_hist[history_current_push_pointer]._timeinfo = localtime(&current_time);
+  command_hist[history_current_push_pointer]._process_info = pid;
+  command_hist[history_current_push_pointer]._user_info = uid;
+  total_executed++;
+  history_current_push_pointer = ((history_current_push_pointer+1)%HISTORY_MAX);
+}
+
+char *command_to_string(char **args){
+
+  #ifdef DEBUG
+    printf("____________command_to_string____________\n");
+  #endif
+
+  char *result;
+  char **temp;
+  char *tok_temp;
+  temp = args;
+  int i = 0;
+  int string_size = 0;
+  while(*(temp+i) != NULL){
+    tok_temp = malloc(sizeof(char)*strlen(*(temp+i)));
+    strcpy(tok_temp,*(temp+i));
+    strcat(tok_temp," ");
+    if(string_size == 0){
+      string_size += strlen(tok_temp);
+      result = malloc(sizeof(char)*string_size);
+      result[0] = '\0';
+    }
+    else{
+      string_size += strlen(tok_temp);
+      result = realloc(result,sizeof(char)*string_size);
+    }
+    strcat(result,tok_temp);
+    free(tok_temp);
+    i++;
+  }
+  return result;
+}

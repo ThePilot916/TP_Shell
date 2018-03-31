@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <termios.h>
 #include <time.h>
+#include <pwd.h>
 
 
 #define CMD_MAX_LEN 256
@@ -65,7 +66,8 @@ void current_command_args_rev();
 void command_io_stack_display();
 void current_command_display();
 void i_o_push(char *, int);
-void history_push();
+void history_push(char **,pid_t,uid_t);
+char *command_to_string(char **args);
 
 
 /*
@@ -96,13 +98,17 @@ typedef struct command_alias{
 	char *_command;
 	char *_alias[ALIAS_MAX];
 	int count;
+	struct command_alias *next;
 }command_aliases;
 
 /*
  *command history
  */
 typedef struct command_history{
-	char *_history[HISTORY_MAX];
+	char *_command;
+	struct tm *_timeinfo;
+	pid_t _process_info;
+	uid_t _user_info;
 }command_history;
 
 
@@ -113,13 +119,15 @@ typedef struct command_history{
 command_stack_node *head;
 command_stack_node *current_node;
 io_redirect io_redirect_info;
-command_aliases command_alias;
-command_history command_hist;
+command_aliases *command_alias_head;
+command_history command_hist[HISTORY_MAX];
 int command_stack_current_size;
 int args_current_push_location;
 bool background;
-int history_current_pointer;
-
+int history_current_push_pointer;
+int history_current_display_pointer;
+time_t current_time;
+int total_executed;
 
 
 #endif

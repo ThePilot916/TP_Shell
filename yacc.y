@@ -54,7 +54,7 @@ io_modifier: GREATx2 WORD  {i_o_push($2, ERROR);}
 
 pipe_list: pipe_list PIPE cmd_args {
 																				#ifdef DEBUG
-																					printf("**In pipe_list, about to push node*********\n");
+																					printf("**In pipe_list\n");
 																					printf("\t|\n");
 																				#endif
 
@@ -63,7 +63,7 @@ pipe_list: pipe_list PIPE cmd_args {
 																		}
 					| cmd_args                  {
 																				 #ifdef DEBUG
-																					 printf("**In pipe_list, about to push node*********\n");
+																					 printf("**In pipe_list\n");
 																					 printf("\t|\n");
 																				 #endif
 

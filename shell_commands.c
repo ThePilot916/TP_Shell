@@ -120,6 +120,16 @@ int tp_history(char **args){
     #ifdef DEBUG
       printf("____________tp_history____________\n");
     #endif
+    printf("\t\t\t\t\tHISTORY\n");
+    printf("-----------------------------------------------------------------------------------------\n");
+    for(int i = 0; (i < HISTORY_MAX && i < total_executed); i++){
+
+      printf("CMD: %s\n",command_hist[i]._command);
+      printf("\t-----pid: %d\n",command_hist[i]._process_info);
+      printf("\t-----uid: %d\n",command_hist[i]._user_info);
+      printf("\t-----time: %s\n",asctime(command_hist[i]._timeinfo));
+      printf("______________________________________\n");
+    }
 }
 
 int tp_alias(char **args){
