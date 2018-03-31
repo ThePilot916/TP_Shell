@@ -16,6 +16,7 @@ void initiate_globals(){
   background = false;
   history_current_display_pointer = 0;
   history_current_push_pointer = 0;
+  command_alias_head = NULL;
 }
 
 void initiate_shell(){
@@ -30,7 +31,7 @@ void initiate_shell(){
         fflush(stdout);
         sleep(0.01);
     	}
-
+      printf("\n");
       initiate_globals();
 
     	printf("\nInitialisation complete!!!");
@@ -107,6 +108,9 @@ void execute_stack(){
     //redirecting stdout
     dup2(fd_out,OUTPUT);
     close(fd_out);
+
+    replace_if_alias(current_node->args);
+
     int custom = execute_custom(current_node->args);
     if(custom == 0){
       int inbuilt = execute_inbuilt(current_node->args);
@@ -194,4 +198,25 @@ void shell_reset(){
   io_redirect_info._type[OUTPUT] = NULL;
   io_redirect_info._type[ERROR] = NULL;
   background = false;
+}
+
+void replace_if_alias(char **args){
+
+  if(command_alias_head != NULL){
+    command_aliases *temp = command_alias_head;
+    while(temp != NULL){
+      int flag = 0;
+      for(int i = 0; i < temp->count; i++){
+        if(strcmp(*(args),temp->alias[i]) == 0){
+          *(args) = temp->command;
+          flag = 1;
+          break;
+        }
+        if(flag == 1){
+          break;
+        }
+      }
+      temp = temp->next;
+    }
+  }
 }

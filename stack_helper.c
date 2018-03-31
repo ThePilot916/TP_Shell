@@ -40,9 +40,10 @@ void arg_push(char *arg){
         printf("____________in arg_push____________\n");
       #endif
 
-      char *temp = malloc(strlen(arg)*sizeof(char));
+      char *temp;
+      temp = malloc((strlen(arg)*sizeof(char))+1);
       strcpy(temp,arg);
-
+      temp[strlen(arg)] = '\0';
       if(args_current_push_location == 0){
         current_node->args = malloc(sizeof(char *));
       }
@@ -59,7 +60,7 @@ void current_command_args_rev(){
       printf("____________in current_command_args_rev____________\n");
     #endif
 
-    char **temp = malloc(sizeof(char *)*args_current_push_location);
+    char **temp = malloc((sizeof(char *)*args_current_push_location)+1);
 
     for(int i = 0; i < args_current_push_location; i++){
       temp[i] = current_node->args[args_current_push_location-i-1];
@@ -67,7 +68,7 @@ void current_command_args_rev(){
     temp[args_current_push_location] = NULL;
 
     //realloc to +1 size to accomodate the NULL at the end.
-    current_node->args = (char **)realloc(current_node->args,sizeof(char *)*args_current_push_location);
+    current_node->args = (char **)realloc(current_node->args,(sizeof(char *)*args_current_push_location)+1);
     //copying the correctly reversed arg_list to the original arg_list
     for(int i = 0; i <= args_current_push_location; i++){
       current_node->args[i] = temp[i];
@@ -161,21 +162,48 @@ char *command_to_string(char **args){
   int i = 0;
   int string_size = 0;
   while(*(temp+i) != NULL){
-    tok_temp = malloc(sizeof(char)*strlen(*(temp+i)));
+    tok_temp = malloc((sizeof(char)*strlen(*(temp+i)))+2);
+    tok_temp[0] = '\0';
     strcpy(tok_temp,*(temp+i));
     strcat(tok_temp," ");
+    tok_temp[strlen(*(temp+i)+1)] = '\0';
     if(string_size == 0){
       string_size += strlen(tok_temp);
-      result = malloc(sizeof(char)*string_size);
+      result = malloc(sizeof(char)*string_size+1);
       result[0] = '\0';
     }
     else{
       string_size += strlen(tok_temp);
-      result = realloc(result,sizeof(char)*string_size);
+      result = realloc(result,(sizeof(char)*string_size)+1);
     }
     strcat(result,tok_temp);
     free(tok_temp);
     i++;
   }
   return result;
+}
+
+
+command_aliases *alias_new(char **args){
+
+  #ifdef DEBUG
+    printf("____________alias_new____________\n");
+  #endif
+
+  char **str_temp;
+  str_temp = args;
+  printf("1\n");
+  command_aliases *temp = malloc(sizeof(command_aliases));
+    printf("2\n");
+  temp->command = malloc((sizeof(char)*strlen(*(str_temp+1)))+1);
+  temp->command[0] = '\0';
+  temp->alias[0] =  malloc((sizeof(char)*strlen(*(str_temp+2)))+1);
+    printf("3\n");
+  strcpy((temp->command),*(str_temp+1));
+    printf("4\n");
+  strcpy((temp->alias[0]),*(str_temp+2));
+    printf("5\n");
+  temp->count = 1;
+  temp->next = NULL;
+  return temp;
 }

@@ -1,6 +1,7 @@
 #ifndef DECLARED
 #define DECLARED
 
+#define DEBUG
 
 #include <stdio.h>
 #include <string.h>
@@ -53,6 +54,7 @@ void initiate_globals();
 void initiate_shell();
 void prompt();
 void execute_stack();
+void replace_if_alias(char **);
 int execute_custom(char **);
 int execute_inbuilt(char **);
 void shell_reset();
@@ -95,12 +97,13 @@ typedef struct io_redirect{
  *Command Aliases, value and function pointers
  */
 typedef struct command_alias{
-	char *_command;
-	char *_alias[ALIAS_MAX];
+	char *command;
+	char *alias[ALIAS_MAX];
 	int count;
 	struct command_alias *next;
 }command_aliases;
 
+command_aliases *alias_new(char **args);
 /*
  *command history
  */

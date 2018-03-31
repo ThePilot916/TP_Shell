@@ -137,7 +137,40 @@ int tp_alias(char **args){
     #ifdef DEBUG
       printf("____________tp_alias____________\n");
     #endif
+
+    char **arg_temp = args;
+    if(command_alias_head == NULL){
+      command_aliases *temp = alias_new(arg_temp);
+      command_alias_head = temp;
+    }
+    else{
+      command_aliases *current = command_alias_head;
+      command_aliases *previous = NULL;
+      while(current != NULL){
+
+        if(strcmp(current->command,*(arg_temp+1)) == 0){
+          break;
+        }
+        previous = current;
+        previous = current->next;
+      }
+
+      if(current == NULL){
+        previous->next = alias_new(arg_temp);
+      }
+      else{
+        if(current->count >= ALIAS_MAX){
+          printf("ERROR: already at max number of aliases\n");
+        }
+        else{
+          char *str_temp = malloc(sizeof(char)*strlen(*(arg_temp+2)));
+          strcpy(str_temp,*(arg_temp+2));
+          current->alias[current->count] = str_temp;
+        }
+      }
+    }
 }
+
 
 int tp_unalias(char **args){
 
