@@ -1,7 +1,6 @@
 #ifndef DECLARED
 #define DECLARED
 
-#define DEBUG
 
 #include <stdio.h>
 #include <string.h>
@@ -14,6 +13,7 @@
 #include <termios.h>
 #include <time.h>
 #include <pwd.h>
+#include <errno.h>
 
 
 #define CMD_MAX_LEN 256
@@ -21,12 +21,11 @@
 #define HISTORY_MAX 25
 #define ALIAS_MAX 10
 #define MAX_BUF_SIZE 255
-#define CUSTOM_COMMAND_COUNT 10
+#define CUSTOM_COMMAND_COUNT 11
 
 #define INPUT	0
 #define OUTPUT 1
 #define ERROR	2
-
 
 
 extern char *shell_commands_list[CUSTOM_COMMAND_COUNT];
@@ -46,6 +45,7 @@ int tp_alias(char **);
 int tp_unalias(char **);
 int tp_set_environment(char **);
 int tp_rm_environment(char **);
+int tp_get_environment(char **);
 
 /*
  *Execution realated functions

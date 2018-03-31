@@ -1,6 +1,6 @@
 %{
 
-	#include "tpshell.h"
+	#include "tp_shell.h"
 	void yyerror(const char *);
 	int yylex();
 	extern char yytext[];

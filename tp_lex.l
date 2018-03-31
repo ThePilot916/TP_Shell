@@ -1,7 +1,8 @@
 %{
 	#include "y.tab.h"
-	#include "tpshell.h"
+	#include "tp_shell.h"
 	void yyerror(const char *);
+
 %}
 
 %%

@@ -1,4 +1,4 @@
-#include "tpshell.h"
+#include "tp_shell.h"
 
 
 void push_init(){
@@ -70,7 +70,7 @@ void current_command_args_rev(){
     //realloc to +1 size to accomodate the NULL at the end.
     current_node->args = (char **)realloc(current_node->args,(sizeof(char *)*args_current_push_location)+1);
     //copying the correctly reversed arg_list to the original arg_list
-    
+
     for(int i = 0; i <= args_current_push_location; i++){
       current_node->args[i] = temp[i];
     }
@@ -193,34 +193,33 @@ command_aliases *alias_new(char **args){
 
   char **str_temp;
   str_temp = args;
-  printf("1\n");
   command_aliases *temp = malloc(sizeof(command_aliases));
-    printf("2\n");
   temp->command = malloc((sizeof(char)*strlen(*(str_temp+1)))+1);
   temp->command[0] = '\0';
   temp->alias[0] =  malloc((sizeof(char)*strlen(*(str_temp+2)))+1);
-    printf("3\n");
   strcpy((temp->command),*(str_temp+1));
-    printf("4\n");
   strcpy((temp->alias[0]),*(str_temp+2));
-    printf("5\n");
   temp->count = 1;
   temp->next = NULL;
   return temp;
 }
 
 void alias_display(){
-
+  #ifdef DEBUG
+    printf("____________alias_display____________\n");
+  #endif
   if(command_alias_head == NULL){
     printf("ERROR: no aliases added\n");
   }
   else{
     command_aliases *temp = command_alias_head;
+    printf("Alias Entries=>\n");
     while(temp != NULL){
-      printf("CMD: %s Aliases =>",temp->command);
+      printf("%s: ",temp->command);
       for(int i = 0; i < temp->count; i++){
-        printf("\t%s\n",temp->alias[i]);
+        printf(" %s",temp->alias[i]);
       }
+      printf("\n");
       temp = temp->next;
     }
   }

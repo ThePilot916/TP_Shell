@@ -1,22 +1,22 @@
 
-all: execute stack_helper lex yacc shell_commands main
+all: lex yacc execute stack_helper shell_commands main
 
-execute: tpshell_execution.c	tpshell.h
-					gcc -g -c tpshell_execution.c -o .tp_exec.o
+lex: tp_lex.l tp_shell.h
+			lex tp_lex.l
 
-stack_helper:	stack_helper.c tpshell.h
-							gcc -g -c stack_helper.c -o .stk_hlp.o
+yacc: tp_yacc.y tp_shell.h
+			yacc -d tp_yacc.y
 
-lex: lex.l tpshell.h
-			lex lex.l
+execute: tp_shell_execution.c	tp_shell.h
+					gcc -g -c tp_shell_execution.c -o .tp_exec.o
 
-yacc: yacc.y tpshell.h
-			yacc -d yacc.y
+stack_helper:	tp_stack_helper.c tp_shell.h
+							gcc -g -c tp_stack_helper.c -o .stk_hlp.o
 
-shell_commands: shell_commands.c tpshell.h
-								gcc -g -c shell_commands.c -o .shell_cmd.o
+shell_commands: tp_shell_commands.c tp_shell.h
+								gcc -g -c tp_shell_commands.c -o .shell_cmd.o
 
-main: shell_main.c tpshell.h
-			gcc	-g -O0 lex.yy.c y.tab.c shell_main.c .tp_exec.o .stk_hlp.o .shell_cmd.o -ll -w -o pilotshell.exe
+main: tp_shell_main.c tp_shell.h
+			gcc	-g -O0 lex.yy.c y.tab.c tp_shell_main.c .tp_exec.o .stk_hlp.o .shell_cmd.o -ll -w -o pilotshell.exe
 clean:
 	rm *.exe .*.o y.tab.h lex.yy.c y.tab.c

@@ -1,4 +1,4 @@
-#include "tpshell.h"
+#include "tp_shell.h"
 
 void initiate_globals(){
 
@@ -181,6 +181,11 @@ int execute_inbuilt(char **args){
 
 
 void shell_reset(){
+
+  #ifdef DEBUG
+    printf("____________shell_reset____________\n");
+  #endif
+
   current_node = head;
   while(current_node->next != NULL){
     command_stack_node *temp = current_node->next;
@@ -201,6 +206,10 @@ void shell_reset(){
 }
 
 void replace_if_alias(char **args){
+
+  #ifdef DEBUG
+    printf("____________replace_if_alias____________\n");
+  #endif
 
   if(command_alias_head != NULL){
     command_aliases *temp = command_alias_head;

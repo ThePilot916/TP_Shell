@@ -1,4 +1,4 @@
-#include "tpshell.h"
+#include "tp_shell.h"
 
 /*
  *List of implemented shell commands
@@ -13,8 +13,9 @@
  	"history",
  	"alias",
  	"unalias",
- 	"set_environ",
- 	"rm_environ"
+ 	"setenv",
+ 	"unsetenv",
+  "getenv"
  };
 
  /*
@@ -31,7 +32,8 @@
  	&tp_alias,
  	&tp_unalias,
  	&tp_set_environment,
- 	&tp_rm_environment
+ 	&tp_rm_environment,
+  &tp_get_environment
  };
 
 int tp_cd(char **args){
@@ -58,7 +60,7 @@ int tp_exit(char **args){
   printf("Exiting shell :|\n");
   pid_t sigh = getpid();
   kill(sigh,SIGKILL);
-
+  return 1;
 }
 
 int tp_help(char **args){
@@ -130,6 +132,7 @@ int tp_history(char **args){
       printf("\t-----time: %s\n",asctime(command_hist[i]._timeinfo));
       printf("______________________________________\n");
     }
+    return 1;
 }
 
 int tp_alias(char **args){
@@ -166,10 +169,14 @@ int tp_alias(char **args){
           char *str_temp = malloc(sizeof(char)*strlen(*(arg_temp+2)));
           strcpy(str_temp,*(arg_temp+2));
           current->alias[current->count] = str_temp;
+          printf("Alias entry added successfully!\n");
         }
       }
     }
-    alias_display();
+    #ifdef DEBUG
+      alias_display();
+    #endif
+    return 1;
 }
 
 
@@ -178,6 +185,31 @@ int tp_unalias(char **args){
     #ifdef DEBUG
       printf("____________tp_unalias____________\n");
     #endif
+
+    command_aliases *temp = command_alias_head;
+    command_aliases *previous = NULL;
+    while(temp != NULL){
+      if(strcmp(temp->command,*(args+1)) == 0){
+        break;
+      }
+      previous = temp;
+      temp = temp->next;
+    }
+    if(temp == NULL){
+      printf("ERROR: no alias entry available\n");
+    }
+    else{
+      if(previous != NULL){
+        previous->next = temp->next;
+      }
+      if(command_alias_head->next == NULL){
+        command_alias_head = NULL;
+      }
+      free(temp);
+      printf("Alias entry removed successfully!\n");
+    }
+
+    return 1;
 }
 
 int tp_set_environment(char **args){
@@ -185,6 +217,12 @@ int tp_set_environment(char **args){
     #ifdef DEBUG
       printf("____________tp_set_environment ____________\n");
     #endif
+    int res = setenv(*(args+1),*(args+2),0);
+    if(res != 0){
+      printf("ERROR: %s\n",strerror(errno));
+      return -1;
+    }
+    return 1;
 }
 
 int tp_rm_environment(char **args){
@@ -192,4 +230,21 @@ int tp_rm_environment(char **args){
     #ifdef DEBUG
       printf("____________tp_rm_environment____________\n");
     #endif
+    int res = unsetenv(*(args+1));
+    if(res != 0){
+      printf("ERROR: %s\n",strerror(errno));
+      return -1;
+    }
+    return 1;
+}
+
+int tp_get_environment(char **args){
+
+  #ifdef DEBUG
+    printf("____________tp_get_environment____________\n");
+  #endif
+  char *res = NULL;
+  res = getenv(*(args+1));
+  printf("%s: %s\n",*(args+1),res);
+  return 1;
 }
