@@ -31,12 +31,10 @@ void initiate_shell(){
         fflush(stdout);
         sleep(0.01);
     	}
-      printf("\n");
       initiate_globals();
-
     	printf("\nInitialisation complete!!!");
     	printf("\nEnjoy the flight captain!!!\n");
-
+      printf("\n");
       prompt();
       if(!yyparse()){
         printf("ERROR: parser issue\n");

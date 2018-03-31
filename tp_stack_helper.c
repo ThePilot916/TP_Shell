@@ -60,7 +60,7 @@ void current_command_args_rev(){
       printf("____________in current_command_args_rev____________\n");
     #endif
 
-    char **temp = malloc((sizeof(char *)*args_current_push_location)+1);
+    char **temp = malloc((sizeof(char *)*args_current_push_location)+2*(sizeof(char*)));
 
     for(int i = 0; i < args_current_push_location; i++){
       temp[i] = current_node->args[args_current_push_location-i-1];
@@ -68,7 +68,7 @@ void current_command_args_rev(){
     temp[args_current_push_location] = NULL;
 
     //realloc to +1 size to accomodate the NULL at the end.
-    current_node->args = (char **)realloc(current_node->args,(sizeof(char *)*args_current_push_location)+1);
+    current_node->args = realloc(current_node->args,(sizeof(char *)*args_current_push_location)+sizeof(char *));
     //copying the correctly reversed arg_list to the original arg_list
 
     for(int i = 0; i <= args_current_push_location; i++){
@@ -167,7 +167,7 @@ char *command_to_string(char **args){
     tok_temp[0] = '\0';
     strcpy(tok_temp,*(temp+i));
     strcat(tok_temp," ");
-    tok_temp[strlen(*(temp+i)+1)] = '\0';
+    //tok_temp[strlen(*(temp+i)+1)] = '\0';
     if(string_size == 0){
       string_size += strlen(tok_temp);
       result = malloc(sizeof(char)*string_size+1);
