@@ -70,7 +70,7 @@ void current_command_display();
 void i_o_push(char *, int);
 void history_push(char **,pid_t,uid_t);
 char *command_to_string(char **args);
-
+void alias_display();
 
 /*
  *Command linked list

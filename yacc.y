@@ -90,7 +90,7 @@ pipe_list: pipe_list PIPE cmd_args {
 														}
 				 ;
 
-arg_list: arg_list WORD  {
+arg_list: WORD arg_list {
 														#ifdef DEBUG
 															printf("**In arg_list*********\n");
 															printf("\t|\n");
@@ -98,7 +98,7 @@ arg_list: arg_list WORD  {
 														if(command_stack_current_size == 0 && args_current_push_location == 0){
 														 push_init();
 														}
-														arg_push($2);
+														arg_push($1);
 													}
 				|
 				;

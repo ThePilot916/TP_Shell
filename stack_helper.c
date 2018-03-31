@@ -70,6 +70,7 @@ void current_command_args_rev(){
     //realloc to +1 size to accomodate the NULL at the end.
     current_node->args = (char **)realloc(current_node->args,(sizeof(char *)*args_current_push_location)+1);
     //copying the correctly reversed arg_list to the original arg_list
+    
     for(int i = 0; i <= args_current_push_location; i++){
       current_node->args[i] = temp[i];
     }
@@ -206,4 +207,21 @@ command_aliases *alias_new(char **args){
   temp->count = 1;
   temp->next = NULL;
   return temp;
+}
+
+void alias_display(){
+
+  if(command_alias_head == NULL){
+    printf("ERROR: no aliases added\n");
+  }
+  else{
+    command_aliases *temp = command_alias_head;
+    while(temp != NULL){
+      printf("CMD: %s Aliases =>",temp->command);
+      for(int i = 0; i < temp->count; i++){
+        printf("\t%s\n",temp->alias[i]);
+      }
+      temp = temp->next;
+    }
+  }
 }

@@ -169,6 +169,7 @@ int tp_alias(char **args){
         }
       }
     }
+    alias_display();
 }
 
 
