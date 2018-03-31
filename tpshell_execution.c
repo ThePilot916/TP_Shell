@@ -23,6 +23,14 @@ void initiate_shell(){
         printf("____________initiating shell____________\n");
       #endif
 
+      printf("\n\t------------------------------------------------------------ThePilot Shell 2.0-----------------------------------------------------------------\n");
+    	for(int i = 0; i <= 100; i++){
+    		printf("\rInitialising shell: %d",i);
+        fflush(stdout);
+        sleep(0.01);
+    	}
+    	printf("\nInitialisation complete!!!");
+    	printf("\nEnjoy the flight captain!!!\n");
       initiate_globals();
       prompt();
       if(!yyparse()){
@@ -63,7 +71,8 @@ void execute_stack(){
   }
 
   current_node = head;
-  for(int i = 0; i < command_stack_current_size && (current_node != NULL || current_node->args != NULL); i++){
+
+  for(int i = 0; i < command_stack_current_size && current_node != NULL; i++){
 
     //redirecting stdin
     dup2(fd_in,INPUT);
@@ -81,6 +90,8 @@ void execute_stack(){
         fd_out = dup(previous_out);
       }
     }
+
+
     else{
       //not the last command being executed, create a pipe and redirect
       int fd_pipe[2];
@@ -92,7 +103,7 @@ void execute_stack(){
     //redirecting stdout
     dup2(fd_out,OUTPUT);
     close(fd_out);
-
+    printf("%s\n",current_node->args[0]);
     int custom = execute_custom(current_node->args);
     if(custom == 0){
       execute_inbuilt(current_node->args);
@@ -117,7 +128,7 @@ int execute_custom(char **args){
 
   int present = 0;
   for(int i = 0; i < CUSTOM_COMMAND_COUNT; i++){
-    if(strcmp(shell_commands_list[i],args[0]) == 0){
+    if(strcmp(shell_commands_list[i],*(args)) == 0){
       present = 1;
       (*shell_commands_pointer[i])(args);
       break;
@@ -152,6 +163,7 @@ void shell_reset(){
     command_stack_node *temp = current_node->next;
     free(current_node->args);
     free(current_node);
+    current_node = temp;
   }
   current_node = NULL;
   head = NULL;

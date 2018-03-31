@@ -22,10 +22,10 @@ command_list:
 
 command_line: pipe_list io_modifier_list background_opt NEWLINE  {
 																																	#ifdef DEBUG
-																																		printf("*********In command_line*********\n");
+																																		printf("**In command_line*********\n");
+																																		printf("\t|\n");
+																																		command_io_stack_display();
 																																	#endif
-																																	printf("Stack size:_________ %d\n",command_stack_current_size);
-																																	command_io_stack_display();
 
 																																	execute_stack();
 																																	shell_reset();
@@ -33,7 +33,8 @@ command_line: pipe_list io_modifier_list background_opt NEWLINE  {
 																																}
 						| NEWLINE                                            {
 																																	#ifdef DEBUG
-																																		printf("*********In command_line*********\n");
+																																		printf("**In command_line*********\n");
+																																		printf("\t|\n");
 																																	#endif
 																																	prompt();
 																																}
@@ -53,16 +54,17 @@ io_modifier: GREATx2 WORD  {i_o_push($2, ERROR);}
 
 pipe_list: pipe_list PIPE cmd_args {
 																				#ifdef DEBUG
-																					printf("*********In pipe_list, about to push node*********\n");
+																					printf("**In pipe_list, about to push node*********\n");
+																					printf("\t|\n");
 																				#endif
 
-																				 //printf("before1: %d\n",command_stack_current_size);
-																				 command_stack_current_size++;
+																				 //command_stack_current_size++;
 																				 //printf("after1: %d\n",command_stack_current_size);
 																		}
 					| cmd_args                  {
 																				 #ifdef DEBUG
-																					 printf("*********In pipe_list, about to push node*********\n");
+																					 printf("**In pipe_list, about to push node*********\n");
+																					 printf("\t|\n");
 																				 #endif
 
 																				 //printf("before2: %d\n",command_stack_current_size);
@@ -72,8 +74,9 @@ pipe_list: pipe_list PIPE cmd_args {
 					 ;
 
  cmd_args: WORD arg_list  {
-														 #ifdef DEBUG
-															printf("*********In cmd_args*********\n");
+														#ifdef DEBUG
+															printf("**In cmd_args*********\n");
+															printf("\t|\n");
 														#endif
 														if(command_stack_current_size == 0 && args_current_push_location == 0){
 														 push_init();
@@ -81,13 +84,16 @@ pipe_list: pipe_list PIPE cmd_args {
 														arg_push($1);
 														current_command_args_rev();
 														push_init();
-														current_command_display();
-													 }
+														#ifdef DEBUG
+														 	current_command_display();
+														#endif
+														}
 				 ;
 
 arg_list: arg_list WORD  {
 														#ifdef DEBUG
-															printf("*********In arg_list*********\n");
+															printf("**In arg_list*********\n");
+															printf("\t|\n");
 														#endif
 														if(command_stack_current_size == 0 && args_current_push_location == 0){
 														 push_init();

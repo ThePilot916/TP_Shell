@@ -30,7 +30,6 @@ void push_init(){
       current_node->next = temp;
       current_node = current_node->next;
     }
-    command_stack_current_size++;
   }
 }
 
@@ -75,7 +74,7 @@ void current_command_args_rev(){
     }
     current_node->args_count = args_current_push_location;
     //printf("%s\t%s\n",current_node->args[0],current_node->args[1]);
-
+    command_stack_current_size++;
     free(temp);
 }
 
