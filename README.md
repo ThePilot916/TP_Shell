@@ -6,6 +6,6 @@ run 'make' to compile everything
 
 run './pilotshell.exe' to execute the shell
 
-define DEBUG in tpshell.h to enable debugging
+\#define DEBUG in tpshell.h to enable debugging
 
-set %error-verbose in yacc.y to enable debugging for the parser
+%error-verbose in yacc.y to enable debugging for the parser
