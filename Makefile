@@ -8,13 +8,13 @@ yacc: tp_yacc.y tp_shell.h
 			yacc -d tp_yacc.y
 
 execute: tp_shell_execution.c	tp_shell.h
-					gcc -g -c tp_shell_execution.c -o .tp_exec.o
+					gcc -g -c tp_shell_execution.c -w -o .tp_exec.o
 
 stack_helper:	tp_stack_helper.c tp_shell.h
-							gcc -g -c tp_stack_helper.c -o .stk_hlp.o
+							gcc -g -c tp_stack_helper.c -w -o .stk_hlp.o
 
 shell_commands: tp_shell_commands.c tp_shell.h
-								gcc -g -c tp_shell_commands.c -o .shell_cmd.o
+								gcc -g -c tp_shell_commands.c -w -o .shell_cmd.o
 
 main: tp_shell_main.c tp_shell.h
 			gcc	-g -O0 lex.yy.c y.tab.c tp_shell_main.c .tp_exec.o .stk_hlp.o .shell_cmd.o -ll -w -o pilotshell.exe

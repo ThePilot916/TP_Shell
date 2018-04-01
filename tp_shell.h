@@ -1,6 +1,7 @@
 #ifndef DECLARED
 #define DECLARED
 
+#define DEBUG
 
 #include <stdio.h>
 #include <string.h>
@@ -31,10 +32,10 @@
 extern char *shell_commands_list[CUSTOM_COMMAND_COUNT];
 extern int (*shell_commands_pointer[CUSTOM_COMMAND_COUNT])(char **);
 
+
 /*
  *Shell functions
  */
-
 int tp_cd(char **);
 int tp_exit(char **);
 int tp_help(char **);
@@ -46,6 +47,7 @@ int tp_unalias(char **);
 int tp_set_environment(char **);
 int tp_rm_environment(char **);
 int tp_get_environment(char **);
+
 
 /*
  *Execution realated functions
@@ -59,6 +61,7 @@ int execute_custom(char **);
 int execute_inbuilt(char **);
 void shell_reset();
 
+
 /*
  *Command and IO_redirect stack operations
  */
@@ -70,11 +73,16 @@ void current_command_display();
 void i_o_push(char *, int);
 void history_push(char **,pid_t,uid_t);
 char *command_to_string(char **args);
+char **string_to_command(char *args);
 void alias_display();
+void quoted_str_rev();
+
 
 /*
- *Command linked list
+ *Structures
  */
+
+//Command linked list
 typedef struct command_stack_node{
 	int	   number;
 	char **args;
@@ -82,20 +90,14 @@ typedef struct command_stack_node{
 	struct command_stack_node *next;
 }command_stack_node;
 
-/*
- * IO redir for the associated cmd,
- * also a linked list, TODO: refine
- */
+//IO redir for the associated cmdalso a linked list, TODO: refine
 typedef struct io_redirect{
 	//int	  _number;
 	char *_type[3];
 	struct io_redirect *next;
 }io_redirect;
 
-
-/*
- *Command Aliases, value and function pointers
- */
+//Command Aliases, value and function pointers
 typedef struct command_alias{
 	char *command;
 	char *alias[ALIAS_MAX];
@@ -104,6 +106,7 @@ typedef struct command_alias{
 }command_aliases;
 
 command_aliases *alias_new(char **args);
+
 /*
  *command history
  */
@@ -113,7 +116,6 @@ typedef struct command_history{
 	pid_t _process_info;
 	uid_t _user_info;
 }command_history;
-
 
 
 /*
@@ -131,6 +133,7 @@ int history_current_push_pointer;
 int history_current_display_pointer;
 time_t current_time;
 int total_executed;
-
+bool parsing_quoted_string;
+char **quoted_string;
 
 #endif

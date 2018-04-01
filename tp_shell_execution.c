@@ -1,5 +1,6 @@
 #include "tp_shell.h"
 
+
 void initiate_globals(){
 
   #ifdef DEBUG
@@ -18,6 +19,7 @@ void initiate_globals(){
   history_current_push_pointer = 0;
   command_alias_head = NULL;
 }
+
 
 void initiate_shell(){
 
@@ -41,6 +43,7 @@ void initiate_shell(){
       }
 }
 
+
 void prompt(){
   char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
   if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
@@ -52,11 +55,10 @@ void prompt(){
 /*
  *To execute the parsed command stack
  */
-
 void execute_stack(){
 
   #ifdef DEBUG
-    printf("___________executing stack____________ \n");
+    printf("____________executing stack____________ \n");
   #endif
 
   int previous_in = dup(INPUT);
@@ -76,14 +78,11 @@ void execute_stack(){
   current_node = head;
 
   for(int i = 0; i < command_stack_current_size && current_node != NULL; i++){
-
     //redirecting stdin
     dup2(fd_in,INPUT);
     close(fd_in);
-
     //setting output redirection
     if(i == command_stack_current_size-1){
-
       if(io_redirect_info._type[OUTPUT] != NULL){
         //use redirected output
         fd_out = open(io_redirect_info._type[OUTPUT],O_RDWR|O_CREAT,0666);
@@ -93,8 +92,6 @@ void execute_stack(){
         fd_out = dup(previous_out);
       }
     }
-
-
     else{
       //not the last command being executed, create a pipe and redirect
       int fd_pipe[2];
@@ -102,13 +99,10 @@ void execute_stack(){
       fd_out = fd_pipe[1];
       fd_in = fd_pipe[0];
     }
-
     //redirecting stdout
     dup2(fd_out,OUTPUT);
     close(fd_out);
-
     replace_if_alias(current_node->args);
-
     int custom = execute_custom(current_node->args);
     if(custom == 0){
       int inbuilt = execute_inbuilt(current_node->args);
@@ -117,16 +111,13 @@ void execute_stack(){
         break;
       }
     }
-
     current_node = current_node->next;
   }
-
   //reseting any IO_redirection done
   dup2(previous_in,INPUT);
   dup2(previous_out,OUTPUT);
   close(previous_in);
   close(previous_out);
-
 }
 
 
@@ -148,6 +139,7 @@ int execute_custom(char **args){
   }
   return present;
 }
+
 
 int execute_inbuilt(char **args){
 
@@ -203,6 +195,7 @@ void shell_reset(){
   background = false;
 }
 
+
 void replace_if_alias(char **args){
 
   #ifdef DEBUG
@@ -211,11 +204,28 @@ void replace_if_alias(char **args){
 
   if(command_alias_head != NULL){
     command_aliases *temp = command_alias_head;
+
     while(temp != NULL){
       int flag = 0;
+
       for(int i = 0; i < temp->count; i++){
         if(strcmp(*(args),temp->alias[i]) == 0){
-          *(args) = temp->command;
+          if(temp->command[0] == '\"'){
+              char **command = string_to_command(temp->command);
+              int i = 0;
+
+              while(*(command+i) != NULL){
+                if(*(args+i) == NULL){
+                  args = realloc(args,sizeof(char *)*(i+2));
+                }
+                *(args+i) = *(command+i);
+                i++;
+              }
+              *(args+i) = NULL;
+          }
+          else{
+            *(args) = temp->command;
+          }
           flag = 1;
           break;
         }

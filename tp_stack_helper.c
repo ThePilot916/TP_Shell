@@ -14,6 +14,7 @@ void push_init(){
 
   else{
     args_current_push_location = 0;
+    parsing_quoted_string = false;
     struct command_stack_node *temp = malloc(sizeof(command_stack_node));
 
     temp->number = command_stack_current_size+1;
@@ -40,19 +41,55 @@ void arg_push(char *arg){
         printf("____________in arg_push____________\n");
       #endif
 
-      char *temp;
-      temp = malloc((strlen(arg)*sizeof(char))+1);
-      strcpy(temp,arg);
-      temp[strlen(arg)] = '\0';
-      if(args_current_push_location == 0){
-        current_node->args = malloc(sizeof(char *));
+      if(parsing_quoted_string){
+        #ifdef DEBUG
+          printf("parsing quoted string: %d\n",args_current_push_location);
+        #endif
+        int i = 0;
+        while(*(quoted_string+i) != NULL){
+          i++;
+        }
+        quoted_string = realloc(quoted_string,sizeof(char *)*(i+2));
+        char *temp = malloc(sizeof(char)*(strlen(arg)+1));
+        strcpy(temp,arg);
+        *(quoted_string+i) = temp;
+        *(quoted_string+i+1) = NULL;
       }
-      else{
-        current_node->args = realloc(current_node->args,sizeof(char *)*(args_current_push_location+1));
+
+      else if(!strchr(arg,'\"')){
+        char *temp;
+        temp = malloc((strlen(arg)*sizeof(char))+1);
+        strcpy(temp,arg);
+        temp[strlen(arg)] = '\0';
+        if(args_current_push_location == 0){
+          current_node->args = malloc(sizeof(char *));
+        }
+        else{
+          current_node->args = realloc(current_node->args,sizeof(char *)*(args_current_push_location+1));
+        }
+        current_node->args[args_current_push_location] = temp;
+
+        if(strchr(arg,'\"') == NULL){
+          args_current_push_location++;
+        }
       }
-      current_node->args[args_current_push_location] = temp;
-      args_current_push_location++;
+
+      if(strchr(arg,'\"') && parsing_quoted_string == false){
+        parsing_quoted_string = true;
+        quoted_string = malloc(sizeof(char *)*2);
+        char *temp = malloc(sizeof(char)*(strlen(arg)+1));
+        strcpy(temp,arg);
+        *(quoted_string) = temp;
+        *(quoted_string+1) = NULL;
+      }
+      else if(strchr(arg,'\"') && parsing_quoted_string == true){
+        parsing_quoted_string = false;
+        quoted_str_rev();
+        current_node->args[args_current_push_location] = command_to_string(quoted_string);
+        args_current_push_location++;
+      }
 }
+
 
 void current_command_args_rev(){
 
@@ -80,6 +117,7 @@ void current_command_args_rev(){
     free(temp);
 }
 
+
 void current_command_display(){
 
     #ifdef DEBUG
@@ -99,6 +137,7 @@ void current_command_display(){
       printf("\n");
     }
 }
+
 
 void command_io_stack_display(){
 
@@ -150,6 +189,7 @@ void history_push(char **args,pid_t pid, uid_t uid){
   history_current_push_pointer = ((history_current_push_pointer+1)%HISTORY_MAX);
 }
 
+
 char *command_to_string(char **args){
 
   #ifdef DEBUG
@@ -185,29 +225,78 @@ char *command_to_string(char **args){
 }
 
 
+char **string_to_command(char *args){
+
+  #ifdef DEBUG
+    printf("____________string_to_command____________\n");
+  #endif
+  //strip the arg of quotes if present
+
+  char *strip_string = malloc(sizeof(char)*strlen(args)+1);
+  strcpy(strip_string,args);
+
+  int w = 0, r = 0;
+  while (*(strip_string+r) != '\0'){
+      if (*(strip_string+r) != '\"'){
+
+          *(strip_string+w) = *(strip_string+r);
+          w++;
+      }
+      r++;
+  }
+  *(strip_string+w)='\0';
+
+  //tokenize and add to command array
+  char **command;
+  char *tok;
+  tok = strtok(strip_string," ");
+  int i = 0;
+  while(tok != NULL){
+      if(i == 0){
+        command = malloc(sizeof(char *)+sizeof(char *));
+      }
+      else{
+        command = realloc(command,(sizeof(char *)*(i+1))+sizeof(char *));
+      }
+      char *temp = malloc((sizeof(char)*strlen(tok))+1);
+      strcpy(temp,tok);
+      command[i] = temp;
+      i++;
+      tok = strtok(NULL," ");
+  }
+
+  command[i] = NULL;
+  free(strip_string);
+  return command;
+}
+
+
 command_aliases *alias_new(char **args){
 
   #ifdef DEBUG
     printf("____________alias_new____________\n");
   #endif
 
-  char **str_temp;
-  str_temp = args;
+  char **strip_string;
+  strip_string = args;
   command_aliases *temp = malloc(sizeof(command_aliases));
-  temp->command = malloc((sizeof(char)*strlen(*(str_temp+1)))+1);
+  temp->command = malloc((sizeof(char)*strlen(*(strip_string+1)))+1);
   temp->command[0] = '\0';
-  temp->alias[0] =  malloc((sizeof(char)*strlen(*(str_temp+2)))+1);
-  strcpy((temp->command),*(str_temp+1));
-  strcpy((temp->alias[0]),*(str_temp+2));
+  temp->alias[0] =  malloc((sizeof(char)*strlen(*(strip_string+2)))+1);
+  strcpy((temp->command),*(strip_string+1));
+  strcpy((temp->alias[0]),*(strip_string+2));
   temp->count = 1;
   temp->next = NULL;
   return temp;
 }
 
+
 void alias_display(){
+
   #ifdef DEBUG
     printf("____________alias_display____________\n");
   #endif
+
   if(command_alias_head == NULL){
     printf("ERROR: no aliases added\n");
   }
@@ -223,4 +312,25 @@ void alias_display(){
       temp = temp->next;
     }
   }
+}
+
+
+void quoted_str_rev(){
+  int str_tok_count, i;
+  i = 0;
+  while(*(quoted_string+i) != NULL){
+    i++;
+  }
+  str_tok_count = i;
+  printf("COUNT+++++++++++++%d\n",str_tok_count);
+  char **temp = malloc(sizeof(char *)*(str_tok_count+2));
+
+  for(int j = 0; j < str_tok_count; j++){
+    temp[j] = quoted_string[str_tok_count-j-1];
+
+  }
+  for(int j = 0; j < str_tok_count; j++){
+    quoted_string[j] = temp[j];
+  }
+  free(temp);
 }

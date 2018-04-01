@@ -3,7 +3,6 @@
 /*
  *List of implemented shell commands
  */
-
  char *shell_commands_list[CUSTOM_COMMAND_COUNT] = {
  	"cd",
  	"exit",
@@ -36,11 +35,13 @@
   &tp_get_environment
  };
 
+
 int tp_cd(char **args){
 
   #ifdef DEBUG
     printf("____________tp_cd____________\n");
   #endif
+
   if (args[1] == NULL) {
     printf("ERROR: no argument given to cd\n");
   }
@@ -52,6 +53,7 @@ int tp_cd(char **args){
   return 1;
 }
 
+
 int tp_exit(char **args){
 
   #ifdef DEBUG
@@ -62,6 +64,7 @@ int tp_exit(char **args){
   kill(sigh,SIGKILL);
   return 1;
 }
+
 
 int tp_help(char **args){
 
@@ -83,6 +86,7 @@ int tp_help(char **args){
     return 1;
 }
 
+
 int tp_pwd(char **args){
 
     #ifdef DEBUG
@@ -94,6 +98,7 @@ int tp_pwd(char **args){
   	printf("%s\n",pwd_buf);
   	return 1;
 }
+
 
 int tp_ls(char **args){
 
@@ -117,6 +122,7 @@ int tp_ls(char **args){
     return 1;
 }
 
+
 int tp_history(char **args){
 
     #ifdef DEBUG
@@ -135,6 +141,7 @@ int tp_history(char **args){
     return 1;
 }
 
+
 int tp_alias(char **args){
 
     #ifdef DEBUG
@@ -145,6 +152,7 @@ int tp_alias(char **args){
     if(command_alias_head == NULL){
       command_aliases *temp = alias_new(arg_temp);
       command_alias_head = temp;
+      printf("Alias entry added successfully!\n");
     }
     else{
       command_aliases *current = command_alias_head;
@@ -160,6 +168,7 @@ int tp_alias(char **args){
 
       if(current == NULL){
         previous->next = alias_new(arg_temp);
+        printf("Alias entry added successfully!\n");
       }
       else{
         if(current->count >= ALIAS_MAX){
@@ -212,6 +221,7 @@ int tp_unalias(char **args){
     return 1;
 }
 
+
 int tp_set_environment(char **args){
 
     #ifdef DEBUG
@@ -225,6 +235,7 @@ int tp_set_environment(char **args){
     return 1;
 }
 
+
 int tp_rm_environment(char **args){
 
     #ifdef DEBUG
@@ -237,6 +248,7 @@ int tp_rm_environment(char **args){
     }
     return 1;
 }
+
 
 int tp_get_environment(char **args){
 
