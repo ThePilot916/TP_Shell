@@ -1,7 +1,6 @@
 #ifndef DECLARED
 #define DECLARED
 
-#define DEBUG
 
 #include <stdio.h>
 #include <string.h>
@@ -22,7 +21,8 @@
 #define HISTORY_MAX 25
 #define ALIAS_MAX 10
 #define MAX_BUF_SIZE 255
-#define CUSTOM_COMMAND_COUNT 11
+#define CUSTOM_COMMAND_COUNT 12
+#define WRITE_SIZE 250
 
 #define INPUT	0
 #define OUTPUT 1
@@ -47,7 +47,7 @@ int tp_unalias(char **);
 int tp_set_environment(char **);
 int tp_rm_environment(char **);
 int tp_get_environment(char **);
-
+int tp_editor(char **);
 
 /*
  *Execution realated functions
@@ -77,6 +77,11 @@ char **string_to_command(char *args);
 void alias_display();
 void quoted_str_rev();
 
+
+/*
+ *Editor functions
+ */
+int editor(char *);
 
 /*
  *Structures

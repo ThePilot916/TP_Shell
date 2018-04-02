@@ -322,7 +322,6 @@ void quoted_str_rev(){
     i++;
   }
   str_tok_count = i;
-  printf("COUNT+++++++++++++%d\n",str_tok_count);
   char **temp = malloc(sizeof(char *)*(str_tok_count+2));
 
   for(int j = 0; j < str_tok_count; j++){

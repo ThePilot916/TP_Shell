@@ -14,7 +14,8 @@
  	"unalias",
  	"setenv",
  	"unsetenv",
-  "getenv"
+  "getenv",
+  "editor"
  };
 
  /*
@@ -32,7 +33,8 @@
  	&tp_unalias,
  	&tp_set_environment,
  	&tp_rm_environment,
-  &tp_get_environment
+  &tp_get_environment,
+  &tp_editor
  };
 
 
@@ -259,4 +261,11 @@ int tp_get_environment(char **args){
   res = getenv(*(args+1));
   printf("%s: %s\n",*(args+1),res);
   return 1;
+}
+
+int tp_editor(char **args){
+
+    editor(*(args+1));
+
+    return 1;
 }

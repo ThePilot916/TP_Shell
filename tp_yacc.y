@@ -71,12 +71,18 @@ pipe_list: pipe_list PIPE cmd_args {
                               printf("**In cmd_args*********\n");
                               printf("\t|\n");
                             #endif
-                            if(command_stack_current_size == 0 && args_current_push_location == 0){
-                             push_init();
+                            if(parsing_quoted_string){
+                              arg_push($1);
                             }
-                            arg_push($1);
-                            current_command_args_rev();
-                            push_init();
+                            else{
+                              if(command_stack_current_size == 0 && args_current_push_location == 0){
+                                  push_init();
+                              }
+                              arg_push($1);
+
+                              current_command_args_rev();
+                              push_init();
+                            }
                             #ifdef DEBUG
                                current_command_display();
                             #endif
@@ -88,8 +94,10 @@ arg_list: WORD arg_list {
                               printf("**In arg_list*********\n");
                               printf("\t|\n");
                             #endif
-                            if(command_stack_current_size == 0 && args_current_push_location == 0){
-                             push_init();
+                            if(!parsing_quoted_string){
+                              if(command_stack_current_size == 0 && args_current_push_location == 0){
+                                push_init();
+                              }
                             }
                             arg_push($1);
                           }
