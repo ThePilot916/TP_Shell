@@ -229,7 +229,7 @@ int tp_set_environment(char **args){
     #ifdef DEBUG
       printf("____________tp_set_environment ____________\n");
     #endif
-    int res = setenv(*(args+1),*(args+2),0);
+    int res = setenv(*(args+1),*(args+2),1);
     if(res != 0){
       printf("ERROR: %s\n",strerror(errno));
       return -1;

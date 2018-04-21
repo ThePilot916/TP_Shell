@@ -34,6 +34,16 @@ void initiate_shell(){
         sleep(0.01);
     	}
       initiate_globals();
+      char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
+      if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
+        printf("ERROR: getting cwd...\n");
+      }
+      strcat(cwd,"/pilotshell.exe");
+      int res = setenv("SHELL",cwd,1);
+      if(res != 0){
+        printf("ERROR: %s\n",strerror(errno));
+        return -1;
+      }
     	printf("\nInitialisation complete!!!");
     	printf("\nEnjoy the flight captain!!!\n");
       printf("\n");
@@ -161,6 +171,10 @@ int execute_inbuilt(char **args){
     pid = getpid();
     uid = geteuid();
     res = execvp(args[0],args);
+    if(res == -1){
+      printf("ERROR: no such command found\n");
+    }
+    exit(0);
   }
   history_push(args,pid,uid);
   if(!background){
