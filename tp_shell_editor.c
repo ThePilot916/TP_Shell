@@ -1,6 +1,5 @@
 #include "tp_shell.h"
 
-
 int editor(char * filename){
 	FILE *f = fopen(filename, "a+");
 	if(!f){
