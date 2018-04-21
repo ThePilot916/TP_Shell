@@ -1,5 +1,6 @@
 #include "tp_shell.h"
 
+
 int editor(char * filename){
 	FILE *f = fopen(filename, "a+");
 	if(!f){
@@ -29,6 +30,8 @@ int editor(char * filename){
 		char* pch = NULL;
 
 	    pch = strtok(string, "\n");
+
+
 
 	    while (pch != NULL)
 	    {

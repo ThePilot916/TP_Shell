@@ -6,7 +6,7 @@
 %}
 
 %%
-
+"\\\n" return MULTLINE; 
 \n		return NEWLINE;
 [ \t]	;
 ">"		return GREAT;

@@ -15,7 +15,7 @@
  	"setenv",
  	"unsetenv",
   "getenv",
-  "editor"
+  "editor",
  };
 
  /*
@@ -34,7 +34,7 @@
  	&tp_set_environment,
  	&tp_rm_environment,
   &tp_get_environment,
-  &tp_editor
+  &tp_editor,
  };
 
 
@@ -268,4 +268,8 @@ int tp_editor(char **args){
     editor(*(args+1));
 
     return 1;
+}
+
+int tp_debug(char **args){
+
 }
