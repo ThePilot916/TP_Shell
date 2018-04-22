@@ -1,8 +1,7 @@
 # Welcome to ThePilot_Shell
 
-run 'make clean' to get rid of all precompiled files
-
-run 'make' to compile everything
+run 'bash tp_setup.sh'
+This will compile and create executables.
 
 run './pilotshell.exe' to execute the shell
 

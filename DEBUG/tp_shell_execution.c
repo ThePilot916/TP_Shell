@@ -2,11 +2,11 @@
 
 
 void initiate_globals(){
-
+/*
   #ifdef DEBUG
     printf("____________initiating globals____________\n");
   #endif
-
+*/
   command_stack_current_size = 0;
   args_current_push_location = 0;
   head = NULL;
@@ -23,7 +23,7 @@ void initiate_globals(){
 
 
 void initiate_shell(){
-
+	/*
       #ifdef DEBUG
         printf("____________initiating shell____________\n");
       #endif
@@ -36,7 +36,7 @@ void initiate_shell(){
         fflush(stdout);
         usleep(15000);
     	}
-
+	*/
       initiate_globals();
       char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
       if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
@@ -48,11 +48,12 @@ void initiate_shell(){
         printf("ERROR: %s\n",strerror(errno));
         return -1;
       }
-
+      /*
     	printf("\nInitialisation complete!!!");
     	printf("\nEnjoy the flight captain!!!\n");
       printf("\n");
-      prompt();
+      prompt();*/
+	printf("\n");
       if(!yyparse()){
         printf("ERROR: parser issue\n");
       }
@@ -60,11 +61,14 @@ void initiate_shell(){
 
 
 void prompt(){
+/*
   char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
   if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
     printf("ERROR: getting cwd...\n");
   }
   printf(ANSI_COLOR_RED"autoPilot"ANSI_COLOR_RESET"_pid:"ANSI_COLOR_GREEN"%d"ANSI_COLOR_RESET"_@root:%s"ANSI_COLOR_RED"$ "ANSI_COLOR_RESET,getpid(),cwd);
+*/
+	printf("__: ");
 }
 
 /*
@@ -133,6 +137,7 @@ void execute_stack(){
   dup2(previous_out,OUTPUT);
   close(previous_in);
   close(previous_out);
+  exit(0);
 }
 
 
@@ -188,11 +193,11 @@ int execute_inbuilt(char **args){
 
 
 void shell_reset(){
-
+/*
   #ifdef DEBUG
     printf("____________shell_reset____________\n");
   #endif
-
+*/
   current_node = head;
   while(current_node->next != NULL){
     command_stack_node *temp = current_node->next;

@@ -19,7 +19,7 @@ editor: tp_shell_editor.c tp_shell.h
 				gcc -g -c tp_shell_editor.c -o .editor.o
 
 main: tp_shell_main.c tp_shell.h
-			gcc	-g -O0 lex.yy.c y.tab.c tp_shell_main.c .tp_exec.o .stk_hlp.o .shell_cmd.o .editor.o -ll -lncurses -w -o pilotshell.exe
+			gcc	-g -O0 lex.yy.c y.tab.c tp_shell_main.c .tp_exec.o .stk_hlp.o .shell_cmd.o .editor.o -ll -lncurses -w -o pilotshell.dbg
 
 clean:
-	rm  *.exe *.dbg .*.o *.tmp y.tab.h lex.yy.c y.tab.c
+	rm *.dbg .*.o *.tmp y.tab.h lex.yy.c y.tab.c

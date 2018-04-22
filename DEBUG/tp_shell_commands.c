@@ -280,25 +280,27 @@ int tp_indebug(char **args){
     printf("____________tp_indebug____________\n");
   #endif
   int i = 1;
-  FILE *f = fopen("tmp_cmd.tmp","a+");
+  FILE *f = fopen("tmp_cmd","a+");
   if(f == NULL){
     printf("ERROR: unable to open/create file\n");
     return -1;
   }
+
 
   while(*(args+i)!=NULL){
     if(*(args+i+1)!=NULL){
       fprintf(f,"%s ", *(args+i));
     }
     else{
-      fprintf(f,"%s\n",*(args+i));
+      fprintf(f,"%s",*(args+i));
     }
     i++;
   }
+
   fclose(f);
 
   int previous_in = dup(INPUT);
-  int fd_in = open("tmp_cmd.tmp",O_RDONLY);
+  int fd_in = open("tmp_cmd",O_RDONLY);
   dup2(fd_in,INPUT);
   close(fd_in);
 
@@ -306,24 +308,21 @@ int tp_indebug(char **args){
   fork_v = fork();
   if(fork_v == 0){
     execvp("pilotshell.dbg",NULL);
+    dup2(previous_in, INPUT);
     fflush(stdout);
     exit(0);
   }
   else{
     wait(NULL);
-    pid_t rm_fork;
+    /*pid_t rm_fork;
     rm_fork = fork();
     if(rm_fork == 0){
-      char *arg[] = {"rm","tmp_cmd.tmp",0};
+      char *arg[] = {"rm","tmp_cmd",0};
       execvp(arg[0],arg);
       exit(0);
-    }
-    else{
-      wait(NULL);
-    }
+    }*/
   }
   dup2(previous_in,INPUT);
-  close(previous_in);
   return 1;
 }
 
