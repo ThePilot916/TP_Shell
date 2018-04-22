@@ -274,59 +274,55 @@ int tp_editor(char **args){
     return 1;
 }
 
-int tp_indebug(char **args_ip){
+int tp_indebug(char **args){
 
   #ifdef DEBUG
     printf("____________tp_indebug____________\n");
   #endif
-
-  FILE *f = fopen(".tmp_cmd.tmp","a+");
+  int i = 1;
+  FILE *f = fopen("tmp_cmd","a+");
   if(f == NULL){
     printf("ERROR: unable to open/create file\n");
     return -1;
   }
 
-  char **command = string_to_command(args_ip[1]);
 
-    int i = 0;
-    while(*(command+i)!=NULL){
-      if(*(command+i+1)!=NULL){
-        fprintf(f,"%s ", *(command+i));
-      }
-      else{
-        fprintf(f,"%s\n",*(command+i));
-      }
-      i++;
-    }
-    fclose(f);
-
-    int previous_in = dup(INPUT);
-    int fd_in = open(".tmp_cmd.tmp",O_RDONLY);
-    dup2(fd_in,INPUT);
-    close(fd_in);
-
-    pid_t fork_v;
-    fork_v = fork();
-    if(fork_v == 0){
-      execvp(".pilotshell.dbg",NULL);
-      fflush(stdout);
-      exit(0);
+  while(*(args+i)!=NULL){
+    if(*(args+i+1)!=NULL){
+      fprintf(f,"%s ", *(args+i));
     }
     else{
-      wait(NULL);
-      pid_t rm_fork;
-      rm_fork = fork();
-      if(rm_fork == 0){
-        char *arg[] = {"rm",".tmp_cmd.tmp",0};
-        execvp(arg[0],arg);
-        exit(0);
-      }
-      else{
-        wait(NULL);
-      }
+      fprintf(f,"%s",*(args+i));
     }
-    dup2(previous_in,INPUT);
-    close(previous_in);
+    i++;
+  }
+
+  fclose(f);
+
+  int previous_in = dup(INPUT);
+  int fd_in = open("tmp_cmd",O_RDONLY);
+  dup2(fd_in,INPUT);
+  close(fd_in);
+
+  pid_t fork_v;
+  fork_v = fork();
+  if(fork_v == 0){
+    execvp("pilotshell.dbg",NULL);
+    dup2(previous_in, INPUT);
+    fflush(stdout);
+    exit(0);
+  }
+  else{
+    wait(NULL);
+    /*pid_t rm_fork;
+    rm_fork = fork();
+    if(rm_fork == 0){
+      char *arg[] = {"rm","tmp_cmd",0};
+      execvp(arg[0],arg);
+      exit(0);
+    }*/
+  }
+  dup2(previous_in,INPUT);
   return 1;
 }
 

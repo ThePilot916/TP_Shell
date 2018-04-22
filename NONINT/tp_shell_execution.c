@@ -2,11 +2,11 @@
 
 
 void initiate_globals(){
-
+/*
   #ifdef DEBUG
     printf("____________initiating globals____________\n");
   #endif
-
+*/
   command_stack_current_size = 0;
   args_current_push_location = 0;
   head = NULL;
@@ -23,7 +23,7 @@ void initiate_globals(){
 
 
 void initiate_shell(){
-
+	/*
       #ifdef DEBUG
         printf("____________initiating shell____________\n");
       #endif
@@ -34,9 +34,9 @@ void initiate_shell(){
       for(int i = 0; i <= 100; i++){
     		printf("\rInitialising shell: %d\%",i);
         fflush(stdout);
-        usleep(12000);
+        usleep(15000);
     	}
-
+	*/
       initiate_globals();
       char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
       if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
@@ -48,11 +48,12 @@ void initiate_shell(){
         printf("ERROR: %s\n",strerror(errno));
         return -1;
       }
-
+      /*
     	printf("\nInitialisation complete!!!");
     	printf("\nEnjoy the flight captain!!!\n");
       printf("\n");
-      prompt();
+      prompt();*/
+	printf("\n");
       if(!yyparse()){
         printf("ERROR: parser issue\n");
       }
@@ -60,11 +61,14 @@ void initiate_shell(){
 
 
 void prompt(){
+/*
   char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
   if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
     printf("ERROR: getting cwd...\n");
   }
   printf(ANSI_COLOR_RED"autoPilot"ANSI_COLOR_RESET"_pid:"ANSI_COLOR_GREEN"%d"ANSI_COLOR_RESET"_@root:%s"ANSI_COLOR_RED"$ "ANSI_COLOR_RESET,getpid(),cwd);
+*/
+	printf("__: ");
 }
 
 /*
@@ -117,25 +121,13 @@ void execute_stack(){
     //redirecting stdout
     dup2(fd_out,OUTPUT);
     close(fd_out);
-
-    //check if the command is aliased
-    //if it is then slyly run a stealth shell in place
-    //else continue with normal execution
-    char **command;
-    command = replace_if_alias(current_node->args);
-
-    if(command != NULL){
-      noninteractive_exec(command);
-    }
-    else{
-      int custom = execute_custom(current_node->args);
-      if(custom == 0){
-        int inbuilt = execute_inbuilt(current_node->args);
-
-        if(inbuilt == -1){
-          printf("ERROR: no such command found\n");
+    replace_if_alias(current_node->args);
+    int custom = execute_custom(current_node->args);
+    if(custom == 0){
+      int inbuilt = execute_inbuilt(current_node->args);
+      if(inbuilt == -1){
+        printf("ERROR: no such command found\n");
         break;
-        }
       }
     }
     current_node = current_node->next;
@@ -145,6 +137,7 @@ void execute_stack(){
   dup2(previous_out,OUTPUT);
   close(previous_in);
   close(previous_out);
+  exit(0);
 }
 
 
@@ -200,11 +193,11 @@ int execute_inbuilt(char **args){
 
 
 void shell_reset(){
-
+/*
   #ifdef DEBUG
     printf("____________shell_reset____________\n");
   #endif
-
+*/
   current_node = head;
   while(current_node->next != NULL){
     command_stack_node *temp = current_node->next;
@@ -225,13 +218,12 @@ void shell_reset(){
 }
 
 
-char **replace_if_alias(char **args){
+void replace_if_alias(char **args){
 
   #ifdef DEBUG
     printf("____________replace_if_alias____________\n");
   #endif
-  char **command;
-  command = NULL;
+
   if(command_alias_head != NULL){
     command_aliases *temp = command_alias_head;
 
@@ -240,65 +232,30 @@ char **replace_if_alias(char **args){
 
       for(int i = 0; i < temp->count; i++){
         if(strcmp(*(args),temp->alias[i]) == 0){
-          command = string_to_command(temp->command);
+          if(temp->command[0] == '\"'){
+              char **command = string_to_command(temp->command);
+              int i = 0;
+
+              while(*(command+i) != NULL){
+                if(*(args+i) == NULL){
+                  args = realloc(args,sizeof(char *)*(i+2));
+                }
+                *(args+i) = *(command+i);
+                i++;
+              }
+              *(args+i) = NULL;
+          }
+          else{
+            *(args) = temp->command;
+          }
+          flag = 1;
+          break;
+        }
+        if(flag == 1){
           break;
         }
       }
       temp = temp->next;
     }
   }
-  return command;
-}
-
-
-void noninteractive_exec(char **command){
-
-  #ifdef DEBUG
-    printf("____________noninteractive_exec____________\n");
-  #endif
-
-    FILE *f = fopen(".tmp_cmd.tmp","a+");
-    if(f == NULL){
-      printf("ERROR: unable to open/create file\n");
-    }
-    printf("1\n");
-    int i = 0;
-    while(*(command+i)!=NULL){
-      if(*(command+i+1)!=NULL){
-        fprintf(f,"%s ", *(command+i));
-      }
-      else{
-        fprintf(f,"%s\n",*(command+i));
-      }
-      i++;
-    }
-    fclose(f);
-
-    int previous_in = dup(INPUT);
-    int fd_in = open(".tmp_cmd.tmp",O_RDONLY);
-    dup2(fd_in,INPUT);
-    close(fd_in);
-
-    pid_t fork_v;
-    fork_v = fork();
-    if(fork_v == 0){
-      execvp(".pilotshell.nin",NULL);
-      fflush(stdout);
-      exit(0);
-    }
-    else{
-      wait(NULL);
-      pid_t rm_fork;
-      rm_fork = fork();
-      if(rm_fork == 0){
-        char *arg[] = {"rm",".tmp_cmd.tmp",0};
-        execvp(arg[0],arg);
-        exit(0);
-      }
-      else{
-        wait(NULL);
-      }
-    }
-    dup2(previous_in,INPUT);
-    close(previous_in);
 }

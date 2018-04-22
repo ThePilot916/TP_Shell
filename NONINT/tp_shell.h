@@ -64,12 +64,10 @@ void initiate_globals();
 void initiate_shell();
 void prompt();
 void execute_stack();
-char **replace_if_alias(char **);
-void noninteractive_exec(char **);//executes the command in nonint shell
+void replace_if_alias(char **);
 int execute_custom(char **);
 int execute_inbuilt(char **);
 void shell_reset();
-
 
 
 /*
