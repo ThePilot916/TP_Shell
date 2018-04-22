@@ -13,15 +13,21 @@
 #include <time.h>
 #include <pwd.h>
 #include <errno.h>
-
+#include <ncurses.h>
 
 #define CMD_MAX_LEN 256
 #define PIPE_MAX 10
 #define HISTORY_MAX 25
 #define ALIAS_MAX 10
 #define MAX_BUF_SIZE 255
-#define CUSTOM_COMMAND_COUNT 12
+#define CUSTOM_COMMAND_COUNT 14
 #define WRITE_SIZE 250
+
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
 #define INPUT	0
 #define OUTPUT 1
@@ -47,6 +53,8 @@ int tp_set_environment(char **);
 int tp_rm_environment(char **);
 int tp_get_environment(char **);
 int tp_editor(char **);
+int tp_indebug(char **);
+int tp_theme(char **);
 
 /*
  *Execution realated functions
@@ -74,7 +82,6 @@ void history_push(char **,pid_t,uid_t);
 char *command_to_string(char **args);
 char **string_to_command(char *args);
 void alias_display();
-void quoted_str_rev();
 
 
 /*
@@ -135,10 +142,9 @@ int args_current_push_location;
 bool background;
 int history_current_push_pointer;
 int history_current_display_pointer;
-time_t current_time;
 int total_executed;
 bool parsing_quoted_string;
 char **quoted_string;
-
+int themeval;
 
 #endif

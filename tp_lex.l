@@ -6,9 +6,11 @@
 %}
 
 %%
-"\\\n" return MULTLINE; 
+\"(\\.|[^"\\])*\" {yylval.str = strdup(yytext); return QUOTE_STR;}
+"\\\n" return MULTLINE;
 \n		return NEWLINE;
 [ \t]	;
+'\^\[\[B' return ARROW_DW;
 ">"		return GREAT;
 "<"		return LESS;
 ">>"	return GREATx2;

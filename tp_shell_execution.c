@@ -18,6 +18,7 @@ void initiate_globals(){
   history_current_display_pointer = 0;
   history_current_push_pointer = 0;
   command_alias_head = NULL;
+  themeval = 1;
 }
 
 
@@ -26,13 +27,16 @@ void initiate_shell(){
       #ifdef DEBUG
         printf("____________initiating shell____________\n");
       #endif
-
-      printf("\n\t------------------------------------------------------------ThePilot Shell 2.0-----------------------------------------------------------------\n");
-    	for(int i = 0; i <= 100; i++){
-    		printf("\rInitialising shell: %d",i);
+      printf("\x1b[41;37m");
+      printf("\n\t------------------------------------------------------------ThePilot Shell 3.0-----------------------------------------------------------------\n");
+      printf(" \x1B[49m\x1B[K ");
+      printf("\n");
+      for(int i = 0; i <= 100; i++){
+    		printf("\rInitialising shell: %d'\%",i);
         fflush(stdout);
-        sleep(0.01);
+        usleep(15000);
     	}
+
       initiate_globals();
       char *cwd = malloc(sizeof(char)*MAX_BUF_SIZE);
       if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
@@ -44,6 +48,7 @@ void initiate_shell(){
         printf("ERROR: %s\n",strerror(errno));
         return -1;
       }
+
     	printf("\nInitialisation complete!!!");
     	printf("\nEnjoy the flight captain!!!\n");
       printf("\n");
@@ -59,7 +64,7 @@ void prompt(){
   if(getcwd(cwd,MAX_BUF_SIZE) == NULL){
     printf("ERROR: getting cwd...\n");
   }
-  printf("autoPilot_pid:%d_@root:%s$ ",getpid(),cwd);
+  printf(ANSI_COLOR_RED"autoPilot"ANSI_COLOR_RESET"_pid:"ANSI_COLOR_GREEN"%d"ANSI_COLOR_RESET"_@root:%s"ANSI_COLOR_RED"$ "ANSI_COLOR_RESET,getpid(),cwd);
 }
 
 /*
@@ -141,7 +146,6 @@ int execute_custom(char **args){
   for(int i = 0; i < CUSTOM_COMMAND_COUNT; i++){
     if(strcmp(shell_commands_list[i],*(args)) == 0){
       present = 1;
-      time(&current_time);
       history_push(args,getpid(),geteuid());
       (*shell_commands_pointer[i])(args);
       break;
@@ -167,7 +171,6 @@ int execute_inbuilt(char **args){
     printf("ERROR: issue forking process\n");
   }
   else if(fork_val == 0){
-    time(&current_time);
     pid = getpid();
     uid = geteuid();
     res = execvp(args[0],args);

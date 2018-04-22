@@ -10,8 +10,9 @@
   char *str;
 }
 
-%token GREAT GREATx2 NEWLINE WORD GREATAMP AMP PIPE LESS QUOTE MULTLINE
+%token GREAT GREATx2 NEWLINE WORD GREATAMP AMP PIPE LESS QUOTE MULTLINE ARROW_DW QUOTE_STR
 %token <str> WORD
+%token <str> QUOTE_STR
 
 
 
@@ -21,7 +22,8 @@ command_list:
             |command_list command_line
             ;
 
-command_line: pipe_list multiline io_modifier_list multiline background_opt NEWLINE  {
+command_line: ARROW_DW {printf("Arrow down\n");}
+            | pipe_list multiline io_modifier_list multiline background_opt NEWLINE  {
                                                                   #ifdef DEBUG
                                                                     printf("**In command_line*********\n");
                                                                     printf("\t|\n");
@@ -32,6 +34,7 @@ command_line: pipe_list multiline io_modifier_list multiline background_opt NEWL
                                                                   shell_reset();
                                                                   prompt();
                                                                 }
+
             | NEWLINE                                            {
                                                                   #ifdef DEBUG
                                                                     printf("**In command_line*********\n");
@@ -67,43 +70,35 @@ pipe_list: pipe_list multiline PIPE multiline cmd_args multiline {
                                     }
            ;
 
- cmd_args: WORD multiline arg_list multiline  {
+ cmd_args: WORD multiline string multiline arg_list multiline  {
                             #ifdef DEBUG
                               printf("**In cmd_args*********\n");
                               printf("\t|\n");
                             #endif
-                            if(parsing_quoted_string){
-                              if(command_stack_current_size == 0 && args_current_push_location == 0){
-                                  push_init();
-                              }
-                              arg_push($1);
-                            }
-                            else{
-                              if(command_stack_current_size == 0 && args_current_push_location == 0){
-                                  push_init();
-                              }
-                              arg_push($1);
 
+
+                              if(command_stack_current_size == 0 && args_current_push_location == 0){
+                                  push_init();
+                              }
+                              arg_push($1);
                               current_command_args_rev();
                               push_init();
-                            }
+
                             #ifdef DEBUG
                                current_command_display();
                             #endif
                             }
          ;
 
-arg_list: WORD multiline arg_list multiline {
+arg_list: arg_list multiline WORD multiline {
                             #ifdef DEBUG
                               printf("**In arg_list*********\n");
                               printf("\t|\n");
                             #endif
-                            if(!parsing_quoted_string){
-                              if(command_stack_current_size == 0 && args_current_push_location == 0){
-                                push_init();
-                              }
+                            if(command_stack_current_size == 0 && args_current_push_location == 0){
+                              push_init();
                             }
-                            arg_push($1);
+                            arg_push($3);
                           }
         |
         ;
@@ -117,6 +112,12 @@ background_opt: AMP multiline        {
 multiline: MULTLINE
          |
          ;
+string: QUOTE_STR { if(command_stack_current_size == 0 && args_current_push_location == 0){
+                    push_init();
+                  }
+                    arg_push($1);}
+      |
+      ;
 
 %%
 

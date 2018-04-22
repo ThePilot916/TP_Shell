@@ -16,6 +16,8 @@
  	"unsetenv",
   "getenv",
   "editor",
+  "indebug",
+  "theme"
  };
 
  /*
@@ -35,6 +37,8 @@
  	&tp_rm_environment,
   &tp_get_environment,
   &tp_editor,
+  &tp_indebug,
+  &tp_theme
  };
 
 
@@ -165,7 +169,7 @@ int tp_alias(char **args){
           break;
         }
         previous = current;
-        previous = current->next;
+        current = current->next;
       }
 
       if(current == NULL){
@@ -270,6 +274,51 @@ int tp_editor(char **args){
     return 1;
 }
 
-int tp_debug(char **args){
+int tp_indebug(char **args){
 
+  #ifdef DEBUG
+    printf("____________tp_indebug____________\n");
+  #endif
+  int i = 1;
+  FILE *f = fopen("tmp_cmd",O_RDWR | O_CREAT | O_APPEND);
+  if(f == NULL){
+    printf("ERROR: unable to open/create file\n");
+    return -1;
+  }
+  while(*(args+i)!=NULL){
+    fprintf(f,"%s ", *(args+i));
+    i++;
+  }
+  fprintf(f,"%s",'\0');
+
+  pid_t fork_v;
+  fork_v = fork();
+  if(fork_v == 0){
+    char *arg[] = {"pilotshell.dbg","<","tmp_cmd",0};
+    execvp(arg[0],arg);
+    fflush(stdout);
+    exit(0);
+  }
+  else{
+    wait(NULL);
+    pid_t rm_fork;
+    rm_fork = fork();
+    if(rm_fork == 0){
+      char *arg[] = {"rm","tmp_cmd",0};
+      execvp(arg[0],arg);
+      exit(0);
+    }
+  }
+
+  return 1;
+}
+
+int tp_theme(char **args){
+  if(themeval == 1){
+    system("color 02");
+    themeval = 0;
+  }
+  else{
+    system("color 70");
+  }
 }

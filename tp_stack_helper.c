@@ -38,25 +38,9 @@ void push_init(){
 void arg_push(char *arg){
 
       #ifdef DEBUG
-        printf("____________in arg_push____________\n");
+        printf("____________in arg_push____________%s\n",arg);
       #endif
 
-      if(parsing_quoted_string){
-        #ifdef DEBUG
-          printf("parsing quoted string: %d\n",args_current_push_location);
-        #endif
-        int i = 0;
-        while(*(quoted_string+i) != NULL){
-          i++;
-        }
-        quoted_string = realloc(quoted_string,sizeof(char *)*(i+2));
-        char *temp = malloc(sizeof(char)*(strlen(arg)+1));
-        strcpy(temp,arg);
-        *(quoted_string+i) = temp;
-        *(quoted_string+i+1) = NULL;
-      }
-
-      else if(!strchr(arg,'\"')){
         char *temp;
         temp = malloc((strlen(arg)*sizeof(char))+1);
         strcpy(temp,arg);
@@ -69,25 +53,8 @@ void arg_push(char *arg){
         }
         current_node->args[args_current_push_location] = temp;
 
-        if(strchr(arg,'\"') == NULL){
-          args_current_push_location++;
-        }
-      }
-
-      if(strchr(arg,'\"') && parsing_quoted_string == false){
-        parsing_quoted_string = true;
-        quoted_string = malloc(sizeof(char *)*2);
-        char *temp = malloc(sizeof(char)*(strlen(arg)+1));
-        strcpy(temp,arg);
-        *(quoted_string) = temp;
-        *(quoted_string+1) = NULL;
-      }
-      else if(strchr(arg,'\"') && parsing_quoted_string == true){
-        parsing_quoted_string = false;
-        quoted_str_rev();
-        current_node->args[args_current_push_location] = command_to_string(quoted_string);
         args_current_push_location++;
-      }
+
 }
 
 
@@ -99,8 +66,12 @@ void current_command_args_rev(){
 
     char **temp = malloc((sizeof(char *)*args_current_push_location)+2*(sizeof(char*)));
 
-    for(int i = 0; i < args_current_push_location; i++){
-      temp[i] = current_node->args[args_current_push_location-i-1];
+    //input cmd: a b c d e is parsed as:  b c d e f a by the yacc parser
+    // so this sets the order right.
+
+    temp[0] = current_node->args[args_current_push_location-0-1];
+    for(int i = 1; i < args_current_push_location; i++){
+        temp[i] = current_node->args[i-1];
     }
     temp[args_current_push_location] = NULL;
 
@@ -181,6 +152,7 @@ void history_push(char **args,pid_t pid, uid_t uid){
     printf("____________history_push____________\n");
   #endif
 
+  time_t current_time = time(NULL);
   command_hist[history_current_push_pointer]._command = command_to_string(args);
   command_hist[history_current_push_pointer]._timeinfo = localtime(&current_time);
   command_hist[history_current_push_pointer]._process_info = pid;
@@ -312,24 +284,4 @@ void alias_display(){
       temp = temp->next;
     }
   }
-}
-
-
-void quoted_str_rev(){
-  int str_tok_count, i;
-  i = 0;
-  while(*(quoted_string+i) != NULL){
-    i++;
-  }
-  str_tok_count = i;
-  char **temp = malloc(sizeof(char *)*(str_tok_count+2));
-
-  for(int j = 0; j < str_tok_count; j++){
-    temp[j] = quoted_string[str_tok_count-j-1];
-
-  }
-  for(int j = 0; j < str_tok_count; j++){
-    quoted_string[j] = temp[j];
-  }
-  free(temp);
 }
