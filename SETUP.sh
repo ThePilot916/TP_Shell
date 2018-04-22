@@ -11,5 +11,5 @@ cd NONINT/
 make clean
 make
 cd ..
-cp DEBUG/.pilotshell.dbg ../tpshell/
-cp NONINT/.pilotshell.nin ../tpshell/
+cp DEBUG/.pilotshell.dbg ../TP_Shell-master/
+cp NONINT/.pilotshell.nin ../TP_Shell-master/

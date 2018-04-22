@@ -14,7 +14,7 @@
 #include <time.h>
 #include <pwd.h>
 #include <errno.h>
-#include <ncurses.h>
+
 
 #define CMD_MAX_LEN 256
 #define PIPE_MAX 10
