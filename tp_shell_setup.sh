@@ -5,4 +5,4 @@ cd DEBUG/
 make clean
 make
 cd ..
-cp DEBUG/pilotshell.dbg ../tpshell/
+cp DEBUG/.pilotshell.dbg ../tpshell/
